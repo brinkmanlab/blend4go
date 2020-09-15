@@ -1,13 +1,10 @@
 package histories
 
-type HistoryDatasetAssociation struct {}
+type HistoryDatasetAssociation struct{}
 type HistoryDatasetCollectionAssociation struct {
-
 }
 
 // GET /api/histories/{history_id}/contents
-
-
 
 // GET /api/histories/{history_id}/contents/{id}
 // GET /api/histories/{history_id}/contents/{type}/{id} return detailed information about an HDA or HDCA within a history
@@ -34,4 +31,3 @@ type HistoryDatasetCollectionAssociation struct {
 
 // GET /api/histories/{history_id}/contents/archive/{id}
 // GET /api/histories/{history_id}/contents/archive/{filename}.{format} build and return a compressed archive of the selected history contents
-

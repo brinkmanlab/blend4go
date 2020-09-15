@@ -1,7 +1,5 @@
 package histories
 
-
-
 // GET /api/histories/{id} return the history with id
 
 // GET /api/histories/deleted/{id} return the deleted history with id

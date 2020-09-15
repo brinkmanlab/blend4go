@@ -33,7 +33,7 @@ type RepoInstallConfig interface {
 }
 
 func NewRepoInstallConfig(toolShedUrl string, name string, owner string, changesetRevision string, installToolDependencies bool, installRepositoryDependencies bool, installResolverDependencies bool, toolPanelSectionId blend4go.GalaxyID, newToolPanelSectionLabel string) RepoInstallConfig {
-	if (toolPanelSectionId != "") {
+	if toolPanelSectionId != "" {
 		// Ensure only one is non-empty
 		newToolPanelSectionLabel = ""
 	}
@@ -75,11 +75,10 @@ func Uninstall(g *blend4go.GalaxyInstance, config RepoInstallConfig) error {
 	return nil
 }
 
-
 // Check for updates to the specified repository, or all installed repositories.
 func CheckForUpdates(g *blend4go.GalaxyInstance, repoID blend4go.GalaxyID) error {
 	req := g.R()
-	if (repoID != "") {
+	if repoID != "" {
 		req.SetQueryParam("id", repoID)
 	}
 	if res, err := req.SetResult(blend4go.StatusResponse{}).Get("/api/tool_shed_repositories/check_for_updates"); err == nil {

@@ -3,28 +3,28 @@ package workflows
 import "blend4go"
 
 type WorkflowInvocation struct {
-    galaxyInstance *blend4go.GalaxyInstance
-/*
-id: this.string(null).nullable(),
-update_time: this.string(null).nullable(),
-uuid: this.string(null).nullable(),
-outputs: this.attr({}),
-output_collections: this.attr({}),
-history_id: this.string(null).nullable(),
-workflow_id: this.string(null).nullable(),
-state: this.string(null).nullable(),
-model_class: this.string("WorkflowInvocation"),
-inputs: this.attr({}),
-steps: this.hasMany(WorkflowInvocationStep, 'workflow_invocation_id'),
- */
+	galaxyInstance *blend4go.GalaxyInstance
+	/*
+	   id: this.string(null).nullable(),
+	   update_time: this.string(null).nullable(),
+	   uuid: this.string(null).nullable(),
+	   outputs: this.attr({}),
+	   output_collections: this.attr({}),
+	   history_id: this.string(null).nullable(),
+	   workflow_id: this.string(null).nullable(),
+	   state: this.string(null).nullable(),
+	   model_class: this.string("WorkflowInvocation"),
+	   inputs: this.attr({}),
+	   steps: this.hasMany(WorkflowInvocationStep, 'workflow_invocation_id'),
+	*/
 }
 
 func (w *WorkflowInvocation) GetBasePath() string {
-    return BasePath
+	return BasePath
 }
 
 func (w *WorkflowInvocation) SetGalaxyInstance(g *blend4go.GalaxyInstance) {
-    w.galaxyInstance = g
+	w.galaxyInstance = g
 }
 
 // DELETE /api/workflows/{workflow_id}/invocations/{invocation_id} DELETE /api/invocations/{invocation_id} Cancel the specified workflow invocation.
@@ -44,4 +44,3 @@ func (w *WorkflowInvocation) SetGalaxyInstance(g *blend4go.GalaxyInstance) {
 // GET /api/workflows/{workflow_id}/invocations/{invocation_id}/jobs_summary GET /api/invocations/{invocation_id}/jobs_summary return job state summary info aggregated across all current jobs of workflow invocation
 
 // PUT /api/workflows/{workflow_id}/invocations/{invocation_id}/steps/{step_id} PUT /api/invocations/{invocation_id}/steps/{step_id} Update state of running workflow step invocation - still very nebulous but this would be for stuff like confirming paused steps can proceed etc….
-

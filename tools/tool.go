@@ -3,47 +3,47 @@ package tools
 import "blend4go"
 
 type ToolSection struct {
-    Id         string `json:"id"`
-    Name       string `json:"name"`
-    Version 	string `json:"version"`
-    ModelClass string `json:"model_class"`
-    Elems	[]Tool `json:"elems"`
+	Id         string `json:"id"`
+	Name       string `json:"name"`
+	Version    string `json:"version"`
+	ModelClass string `json:"model_class"`
+	Elems      []Tool `json:"elems"`
 }
 
 type Tool struct {
-    galaxyInstance   *blend4go.GalaxyInstance
-    Id               string `json:"id"`
-    Name             string `json:"name"`
-    Version          string `json:"version"`
-    MinWidth         int	`json:"min_width"`
-    Target           string `json:"target"`
-    Link             string `json:"link"`
-    PanelSectionId   string   `json:"panel_section_id"`
-    EdamTopics       []string `json:"edam_topics"`
-    FormStyle        string   `json:"form_style"`
-    EdamOperations   []string `json:"edam_operations"`
-    Labels           []string `json:"labels"`
-    Description      string `json:"description"`
-    ConfigFile       string `json:"config_file"`
-    Xrefs            []string `json:"xrefs"`
-    PanelSectionName string `json:"panel_section_name"`
+	galaxyInstance   *blend4go.GalaxyInstance
+	Id               string   `json:"id"`
+	Name             string   `json:"name"`
+	Version          string   `json:"version"`
+	MinWidth         int      `json:"min_width"`
+	Target           string   `json:"target"`
+	Link             string   `json:"link"`
+	PanelSectionId   string   `json:"panel_section_id"`
+	EdamTopics       []string `json:"edam_topics"`
+	FormStyle        string   `json:"form_style"`
+	EdamOperations   []string `json:"edam_operations"`
+	Labels           []string `json:"labels"`
+	Description      string   `json:"description"`
+	ConfigFile       string   `json:"config_file"`
+	Xrefs            []string `json:"xrefs"`
+	PanelSectionName string   `json:"panel_section_name"`
 }
 
 func (t *Tool) Reload() error {
-    // GET /api/tools/{tool_id}/reload Reload specified tool
-    panic("Implement me")
+	// GET /api/tools/{tool_id}/reload Reload specified tool
+	panic("Implement me")
 }
 
 // Attempts to install requirements via the dependency resolver
 func (t *Tool) InstallDependencies() error {
-    // POST /api/tools/{tool_id}/dependencies
-    panic("Implement me")
+	// POST /api/tools/{tool_id}/dependencies
+	panic("Implement me")
 }
 
 // DELETE /api/tools/{tool_id}/dependencies Attempts to uninstall requirements via the dependency resolver
 func (t *Tool) UninstallDependencies() error {
-    // POST /api/tools/{tool_id}/dependencies
-    panic("Implement me")
+	// POST /api/tools/{tool_id}/dependencies
+	panic("Implement me")
 }
 
 //POST /api/tools/{tool_id}/build_dependency_cache Attempts to cache installed dependencies.

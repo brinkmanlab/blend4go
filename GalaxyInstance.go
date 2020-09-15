@@ -5,6 +5,7 @@ import (
 	"path"
 	"runtime/debug"
 )
+
 // https://blog.golang.org/publishing-go-modules
 // https://github.com/go-resty/resty
 // https://pkg.go.dev/github.com/go-resty/resty
@@ -12,7 +13,7 @@ type GalaxyID = string
 type GalaxyRequest = *resty.Request
 
 type StatusResponse struct {
-	Status string
+	Status  string
 	Message string
 }
 
@@ -36,7 +37,7 @@ func NewGalaxyInstance(host, apiKey string) (g *GalaxyInstance) {
 	r.SetHeader("Accept", "application/json")
 	r.SetHeaders(map[string]string{
 		"Content-Type": "application/json",
-		"User-Agent": agent,
+		"User-Agent":   agent,
 	})
 	return &GalaxyInstance{client: r}
 }
@@ -89,7 +90,7 @@ func (g *GalaxyInstance) R() GalaxyRequest {
 
 type ToolShed struct {
 	Name string `json:"name"`
-	Url string `json:"url"`
+	Url  string `json:"url"`
 }
 
 func (g *GalaxyInstance) ToolSheds() []ToolShed {
