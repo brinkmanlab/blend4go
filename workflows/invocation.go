@@ -4,19 +4,17 @@ import "blend4go"
 
 type WorkflowInvocation struct {
 	galaxyInstance *blend4go.GalaxyInstance
-	/*
-	   id: this.string(null).nullable(),
-	   update_time: this.string(null).nullable(),
-	   uuid: this.string(null).nullable(),
-	   outputs: this.attr({}),
-	   output_collections: this.attr({}),
-	   history_id: this.string(null).nullable(),
-	   workflow_id: this.string(null).nullable(),
-	   state: this.string(null).nullable(),
-	   model_class: this.string("WorkflowInvocation"),
-	   inputs: this.attr({}),
-	   steps: this.hasMany(WorkflowInvocationStep, 'workflow_invocation_id'),
-	*/
+	Id             blend4go.GalaxyID `json:"id"`
+	UpdateTime     string            `json:"update_time"`
+	Uuid           string            `json:"uuid"`
+	// Outputs ? `json:"outputs"`
+	// Output_collections ? `json:"output_collections"`
+	HistoryId  blend4go.GalaxyID `json:"history_id"`
+	WorkflowId blend4go.GalaxyID `json:"workflow_id"`
+	State      string            `json:"state"`
+	ModelClass string            `json:"model_class"`
+	// Inputs ? `json:"inputs"`
+	Steps []WorkflowInvocationStep `json:"steps"`
 }
 
 func (w *WorkflowInvocation) GetBasePath() string {
