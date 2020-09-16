@@ -1,14 +1,14 @@
 package repositories
 
 import (
-	"blend4go"
 	"errors"
+	"github.com/brinkmanlab/blend4go"
 )
 
 const BasePath = "/api/tool_shed_repositories"
 
 func List(g *blend4go.GalaxyInstance) ([]Repository, error) {
-	if res, err := g.List(BasePath, []Repository{}); err == nil {
+	if res, err := g.List(BasePath, []Repository{}, nil); err == nil {
 		return res.([]Repository), nil
 	} else {
 		return nil, err
