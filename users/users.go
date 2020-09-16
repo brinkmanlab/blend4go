@@ -1,7 +1,7 @@
 package users
 
 import (
-    "blend4go"
+	"blend4go"
 )
 
 const BasePath = "/api/users"
@@ -14,39 +14,39 @@ filterName - (optional) A username to filter on. (Non-admin users can only use t
 filterAny - (optional) Filter on username OR email. (Non-admin users can use this, the email filter and username filter will only be active if their corresponding expose_user_* is True in galaxy.ini)
 */
 func List(g *blend4go.GalaxyInstance, deleted bool, filterEmail, filterName, filterAny string) ([]User, error) {
-    q := make(map[string]string)
-    if deleted {
-        q["deleted"] = "true"
-    }
-    if filterEmail != "" {
-        q["f_email"] = filterEmail
-    }
-    if filterName != "" {
-        q["f_name"] = filterName
-    }
-    if filterAny != "" {
-        q["f_any"] = filterAny
-    }
-    // GET /api/users GET /api/users/deleted
-    res, err := g.List(BasePath, []User{}, &q)
-    return res.([]User), err
+	q := make(map[string]string)
+	if deleted {
+		q["deleted"] = "true"
+	}
+	if filterEmail != "" {
+		q["f_email"] = filterEmail
+	}
+	if filterName != "" {
+		q["f_name"] = filterName
+	}
+	if filterAny != "" {
+		q["f_any"] = filterAny
+	}
+	// GET /api/users GET /api/users/deleted
+	res, err := g.List(BasePath, []User{}, &q)
+	return res.([]User), err
 }
 
 // Displays information about a user.
 func Get(g *blend4go.GalaxyInstance, id blend4go.GalaxyID) (*User, error) {
-    // GET /api/users/{encoded_id} GET /api/users/deleted/{encoded_id} GET /api/users/current
-    if id == "" {
-        id = "current"
-    }
-    res, err := g.Get(id, &User{})
-    return res.(*User), err
+	// GET /api/users/{encoded_id} GET /api/users/deleted/{encoded_id} GET /api/users/current
+	if id == "" {
+		id = "current"
+	}
+	res, err := g.Get(id, &User{})
+	return res.(*User), err
 }
 
 // returns an API key for authenticated user based on BaseAuth headers
 func GetAPIKey(g *blend4go.GalaxyInstance, username, password string) (string, error) {
-    if res, err := g.R().SetBasicAuth(username, password).Get("/api/authenticate/baseauth"); err == nil {
-        return res.Result().(map[string]string)["api_key"], nil
-    } else {
-        return "", err
-    }
+	if res, err := g.R().SetBasicAuth(username, password).Get("/api/authenticate/baseauth"); err == nil {
+		return res.Result().(map[string]string)["api_key"], nil
+	} else {
+		return "", err
+	}
 }
