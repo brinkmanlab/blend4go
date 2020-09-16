@@ -1,4 +1,4 @@
-module blend4go
+module github.com/brinkmanlab/blend4go
 
 go 1.15
 
