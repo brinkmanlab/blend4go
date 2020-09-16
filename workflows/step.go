@@ -1,9 +1,9 @@
 package workflows
 
 import (
-	"blend4go"
-	"blend4go/histories"
-	"blend4go/jobs"
+	"github.com/brinkmanlab/blend4go"
+	"github.com/brinkmanlab/blend4go/histories"
+	"github.com/brinkmanlab/blend4go/jobs"
 )
 
 type WorkflowInvocationStep struct {

@@ -1,7 +1,7 @@
 package users
 
 import (
-	"blend4go"
+	"github.com/brinkmanlab/blend4go"
 )
 
 type User struct {

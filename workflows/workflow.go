@@ -1,7 +1,7 @@
 package workflows
 
 import (
-	"blend4go"
+	"github.com/brinkmanlab/blend4go"
 )
 
 type StoredWorkflowInput struct {

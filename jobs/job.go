@@ -1,6 +1,6 @@
 package jobs
 
-import "blend4go"
+import "github.com/brinkmanlab/blend4go"
 
 type Job struct {
 	galaxyInstance *blend4go.GalaxyInstance

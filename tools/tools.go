@@ -1,7 +1,7 @@
 package tools
 
 import (
-	"blend4go"
+	"github.com/brinkmanlab/blend4go"
 	"path"
 )
 

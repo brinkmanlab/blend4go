@@ -1,6 +1,6 @@
 package tools
 
-import "blend4go"
+import "github.com/brinkmanlab/blend4go"
 
 type ToolSection struct {
 	Id         string `json:"id"`

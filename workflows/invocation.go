@@ -1,6 +1,6 @@
 package workflows
 
-import "blend4go"
+import "github.com/brinkmanlab/blend4go"
 
 type WorkflowInvocation struct {
 	galaxyInstance *blend4go.GalaxyInstance

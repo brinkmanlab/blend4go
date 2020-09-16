@@ -1,6 +1,6 @@
 package workflows
 
-import "blend4go"
+import "github.com/brinkmanlab/blend4go"
 
 const BasePath = "/api/workflows"
 
