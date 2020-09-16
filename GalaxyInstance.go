@@ -26,6 +26,19 @@ type GalaxyModel interface {
 	SetGalaxyInstance(instance *GalaxyInstance)
 }
 
+// returns an API key for authenticated user based on BaseAuth headers
+func GetAPIKey(host, username, password string) (string, error) {
+	r := resty.New()
+	r.SetHostURL(host)
+	r.SetHeader("Accept", "application/json")
+	r.SetBasicAuth(username, password)
+	if res, err := r.R().Get("/api/authenticate/baseauth"); err == nil {
+		return res.Result().(map[string]string)["api_key"], nil
+	} else {
+		return "", err
+	}
+}
+
 func NewGalaxyInstance(host, apiKey string) (g *GalaxyInstance) {
 	agent := "blend4go"
 	if info, ok := debug.ReadBuildInfo(); ok {

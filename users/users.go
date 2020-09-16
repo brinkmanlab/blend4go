@@ -41,12 +41,3 @@ func Get(g *blend4go.GalaxyInstance, id blend4go.GalaxyID) (*User, error) {
 	res, err := g.Get(id, &User{})
 	return res.(*User), err
 }
-
-// returns an API key for authenticated user based on BaseAuth headers
-func GetAPIKey(g *blend4go.GalaxyInstance, username, password string) (string, error) {
-	if res, err := g.R().SetBasicAuth(username, password).Get("/api/authenticate/baseauth"); err == nil {
-		return res.Result().(map[string]string)["api_key"], nil
-	} else {
-		return "", err
-	}
-}
