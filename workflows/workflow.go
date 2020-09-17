@@ -52,6 +52,14 @@ func (w *StoredWorkflow) SetGalaxyInstance(g *blend4go.GalaxyInstance) {
 	w.galaxyInstance = g
 }
 
+func (w *StoredWorkflow) GetID() blend4go.GalaxyID {
+	return w.Id
+}
+
+func (w *StoredWorkflow) SetID(id blend4go.GalaxyID) {
+	w.Id = id
+}
+
 func NewStoredWorkflow(g *blend4go.GalaxyInstance, json string) (*StoredWorkflow, error) {
 	if res, err := g.R().SetResult(&StoredWorkflow{galaxyInstance: g}).SetBody(map[string]string{
 		"workflow": json,

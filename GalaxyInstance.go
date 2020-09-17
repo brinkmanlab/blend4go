@@ -24,6 +24,8 @@ type GalaxyInstance struct {
 type GalaxyModel interface {
 	GetBasePath() string
 	SetGalaxyInstance(instance *GalaxyInstance)
+	GetID() GalaxyID
+	SetID(GalaxyID)
 }
 
 // returns an API key for authenticated user based on BaseAuth headers

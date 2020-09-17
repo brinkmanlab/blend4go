@@ -25,6 +25,14 @@ func (w *WorkflowInvocation) SetGalaxyInstance(g *blend4go.GalaxyInstance) {
 	w.galaxyInstance = g
 }
 
+func (w *WorkflowInvocation) GetID() blend4go.GalaxyID {
+	return w.Id
+}
+
+func (w *WorkflowInvocation) SetID(id blend4go.GalaxyID) {
+	w.Id = id
+}
+
 // DELETE /api/workflows/{workflow_id}/invocations/{invocation_id} DELETE /api/invocations/{invocation_id} Cancel the specified workflow invocation.
 
 // GET /api/workflows/{workflow_id}/invocations/{invocation_id}/report GET /api/invocations/{invocation_id}/report Get JSON summarizing invocation for reporting.

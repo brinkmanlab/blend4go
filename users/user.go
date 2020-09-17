@@ -28,6 +28,14 @@ func (u *User) SetGalaxyInstance(g *blend4go.GalaxyInstance) {
 	u.galaxyInstance = g
 }
 
+func (u *User) GetID() blend4go.GalaxyID {
+	return u.Id
+}
+
+func (u *User) SetID(id blend4go.GalaxyID) {
+	u.Id = id
+}
+
 // Creates a new Galaxy user.
 func NewUser(g *blend4go.GalaxyInstance, username, password, email string) (*User, error) {
 	//POST /api/users

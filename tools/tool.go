@@ -10,6 +10,14 @@ type ToolSection struct {
 	Elems      []Tool `json:"elems"`
 }
 
+func (t *ToolSection) GetID() blend4go.GalaxyID {
+	return t.Id
+}
+
+func (t *ToolSection) SetID(id blend4go.GalaxyID) {
+	t.Id = id
+}
+
 type Tool struct {
 	galaxyInstance   *blend4go.GalaxyInstance
 	Id               string   `json:"id"`
@@ -27,6 +35,14 @@ type Tool struct {
 	ConfigFile       string   `json:"config_file"`
 	Xrefs            []string `json:"xrefs"`
 	PanelSectionName string   `json:"panel_section_name"`
+}
+
+func (t *Tool) GetID() blend4go.GalaxyID {
+	return t.Id
+}
+
+func (t *Tool) SetID(id blend4go.GalaxyID) {
+	t.Id = id
 }
 
 func (t *Tool) Reload() error {

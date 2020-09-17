@@ -28,14 +28,22 @@ type Repository struct {
 	} `json:"tool_shed_status,omitempty"`
 }
 
-func (r *Repository) getBasePath() string {
+func (r *Repository) GetBasePath() string {
 	return BasePath
 }
 
-func (r *Repository) setGalaxyInstance(g *blend4go.GalaxyInstance) {
+func (r *Repository) SetGalaxyInstance(g *blend4go.GalaxyInstance) {
 	r.galaxyInstance = g
 }
 
+func (r *Repository) GetID() blend4go.GalaxyID {
+	return r.Id
+}
+
+func (r *Repository) SetID(id blend4go.GalaxyID) {
+	r.Id = id
+}
+
 func (r *Repository) Reload() error {
-	return nil
+	panic("Implement me")
 }
