@@ -15,6 +15,14 @@ func List(g *blend4go.GalaxyInstance) ([]Repository, error) {
 	}
 }
 
+func Get(g *blend4go.GalaxyInstance, id blend4go.GalaxyID) (*Repository, error) {
+	if res, err := g.Get(id, &Repository{}); err == nil {
+		return res.(*Repository), nil
+	} else {
+		return nil, err
+	}
+}
+
 type repoInstallConfig struct {
 	Id                            blend4go.GalaxyID `json:"id,omitempty"`
 	ToolShedUrl                   string            `json:"tool_shed_url"`

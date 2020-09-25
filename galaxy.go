@@ -77,7 +77,9 @@ func (g *GalaxyInstance) List(path string, models interface{}, params *map[strin
 
 func (g *GalaxyInstance) Get(id GalaxyID, model GalaxyModel) (GalaxyModel, error) {
 	if res, err := g.client.R().SetResult(model).Get(path.Join(model.GetBasePath(), id)); err == nil {
-		return res.Result().(GalaxyModel), nil
+		m := res.Result().(GalaxyModel)
+		m.SetGalaxyInstance(g)
+		return m, nil
 	} else {
 		return nil, err
 	}
