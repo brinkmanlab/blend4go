@@ -75,17 +75,45 @@ func NewStoredWorkflow(g *blend4go.GalaxyInstance, json string) (*StoredWorkflow
 // GET /api/workflows/{encoded_workflow_id}/versions
 // instance (boolean) – true if fetch by Workflow ID instead of StoredWorkflow id, false by default.
 
-// GET /api/workflows/{encoded_workflow_id}/download
-
-// Deletes a specified workflow
+// Delete a specified workflow
 func (w *StoredWorkflow) Delete() error {
 	// DELETE /api/workflows/{encoded_workflow_id}
-	return w.galaxyInstance.Delete(w.Id, w)
+	return w.galaxyInstance.Delete(w)
 }
 
-// PUT /api/workflows/{id}
-func (w *StoredWorkflow) Update() error {
-	return w.galaxyInstance.Put(w.Id, w)
+// Update the specified workflow. If json == "", only the name, annotation, and show_in_tool_panel will be updated.
+func (w *StoredWorkflow) Update(json string) error {
+	// PUT /api/workflows/{id}
+	body := make(map[string]string)
+	if w.ShowInToolPanel {
+		body["menu_entry"] = "True"
+	} else {
+		body["menu_entry"] = "False"
+	}
+
+	if json != "" {
+		body["workflow"] = json
+	}
+
+	body["name"] = w.Name
+	body["annotation"] = w.Annotation
+
+	_, err := w.galaxyInstance.R().SetResult(w).SetBody(body).Put(path.Join(w.GetBasePath(), w.GetID()))
+	return err
+}
+
+func (w *StoredWorkflow) Download() (string, error) {
+	// GET /api/workflows/{encoded_workflow_id}/download
+	res, err := w.galaxyInstance.R().Get(path.Join(w.GetBasePath(), w.GetID(), "download"))
+	return res.String(), err
+}
+
+func (w *StoredWorkflow) Repositories() ([]repositories.Repository, error) {
+	if workflow, err := w.Download(); err == nil {
+		return Repositories(workflow)
+	} else {
+		return nil, err
+	}
 }
 
 // Schedule the workflow specified by workflow_id to run.

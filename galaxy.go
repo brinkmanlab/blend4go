@@ -83,16 +83,16 @@ func (g *GalaxyInstance) Get(id GalaxyID, model GalaxyModel) (GalaxyModel, error
 	}
 }
 
-func (g *GalaxyInstance) Put(id GalaxyID, model GalaxyModel) error {
-	if _, err := g.R().Put(path.Join(model.GetBasePath(), id)); err == nil {
-		return err // TODO handle result. Status message?
+func (g *GalaxyInstance) Put(model GalaxyModel) (GalaxyModel, error) {
+	if res, err := g.R().SetResult(model).SetBody(model).Put(path.Join(model.GetBasePath(), model.GetID())); err == nil {
+		return res.Result().(GalaxyModel), nil
 	} else {
-		return err
+		return nil, err
 	}
 }
 
-func (g *GalaxyInstance) Delete(id GalaxyID, model GalaxyModel) error {
-	if _, err := g.R().Delete(path.Join(model.GetBasePath(), id)); err == nil {
+func (g *GalaxyInstance) Delete(model GalaxyModel) error {
+	if _, err := g.R().Delete(path.Join(model.GetBasePath(), model.GetID())); err == nil {
 		return err // TODO handle result. Status message?
 	} else {
 		return err

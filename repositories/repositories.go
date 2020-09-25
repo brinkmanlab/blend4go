@@ -29,30 +29,16 @@ type repoInstallConfig struct {
 	RemoveFromDisk                bool              `json:"remove_from_disk,omitempty"`
 }
 
-type RepoInstallConfig interface {
-}
-
-func NewRepoInstallConfig(toolShedUrl string, name string, owner string, changesetRevision string, installToolDependencies bool, installRepositoryDependencies bool, installResolverDependencies bool, toolPanelSectionId blend4go.GalaxyID, newToolPanelSectionLabel string) RepoInstallConfig {
+// Install a specified repository revision from a specified tool shed into Galaxy
+func Install(g *blend4go.GalaxyInstance, toolShedUrl string, name string, owner string, changesetRevision string, installToolDependencies bool, installRepositoryDependencies bool, installResolverDependencies bool, toolPanelSectionId blend4go.GalaxyID, newToolPanelSectionLabel string) error {
+	//https://github.com/galaxyproject/ephemeris/blob/474a1c1cd4d5444ece00a3e53eafcb234643db90/src/ephemeris/shed_tools.py#L374
+	// POST /api/tool_shed_repositories/install_repository_revision
+	// https://docs.galaxyproject.org/en/latest/api/api.html#galaxy.webapps.galaxy.api.tool_shed_repositories.ToolShedRepositoriesController.install_repository_revision
 	if toolPanelSectionId != "" {
 		// Ensure only one is non-empty
 		newToolPanelSectionLabel = ""
 	}
-	return repoInstallConfig{ToolShedUrl: toolShedUrl, Name: name, Owner: owner, ChangesetRevision: changesetRevision, InstallToolDependencies: installToolDependencies, InstallRepositoryDependencies: installRepositoryDependencies, InstallResolverDependencies: installResolverDependencies, ToolPanelSectionId: toolPanelSectionId, NewToolPanelSectionLabel: newToolPanelSectionLabel}
-}
-
-func NewRepoUninstallConfig(toolShedUrl string, name string, owner string, changesetRevision string, removeFromDisk bool) RepoInstallConfig {
-	return repoInstallConfig{ToolShedUrl: toolShedUrl, Name: name, Owner: owner, ChangesetRevision: changesetRevision, RemoveFromDisk: removeFromDisk}
-}
-
-func NewRepoUninstallConfigID(id blend4go.GalaxyID, removeFromDisk bool) RepoInstallConfig {
-	return repoInstallConfig{Id: id, RemoveFromDisk: removeFromDisk}
-}
-
-// Install a specified repository revision from a specified tool shed into Galaxy
-func Install(g *blend4go.GalaxyInstance, config RepoInstallConfig) error {
-	//https://github.com/galaxyproject/ephemeris/blob/474a1c1cd4d5444ece00a3e53eafcb234643db90/src/ephemeris/shed_tools.py#L374
-	// POST /api/tool_shed_repositories/install_repository_revision
-	// https://docs.galaxyproject.org/en/latest/api/api.html#galaxy.webapps.galaxy.api.tool_shed_repositories.ToolShedRepositoriesController.install_repository_revision
+	config := repoInstallConfig{ToolShedUrl: toolShedUrl, Name: name, Owner: owner, ChangesetRevision: changesetRevision, InstallToolDependencies: installToolDependencies, InstallRepositoryDependencies: installRepositoryDependencies, InstallResolverDependencies: installResolverDependencies, ToolPanelSectionId: toolPanelSectionId, NewToolPanelSectionLabel: newToolPanelSectionLabel}
 	if res, err := g.R().SetBody(config).SetResult(blend4go.StatusResponse{}).Post("/api/tool_shed_repositories/install_repository_revision"); err == nil {
 		if res.Result().(blend4go.StatusResponse).Status == "ok" {
 			return errors.New(res.Result().(blend4go.StatusResponse).Message)
@@ -64,7 +50,21 @@ func Install(g *blend4go.GalaxyInstance, config RepoInstallConfig) error {
 }
 
 // Uninstall a specified repository revision from a specified tool shed from Galaxy
-func Uninstall(g *blend4go.GalaxyInstance, config RepoInstallConfig) error {
+func Uninstall(g *blend4go.GalaxyInstance, toolShedUrl string, name string, owner string, changesetRevision string, removeFromDisk bool) error {
+	config := repoInstallConfig{ToolShedUrl: toolShedUrl, Name: name, Owner: owner, ChangesetRevision: changesetRevision, RemoveFromDisk: removeFromDisk}
+	if res, err := g.R().SetBody(config).SetResult(blend4go.StatusResponse{}).Delete("/api/tool_shed_repositories/"); err == nil {
+		if res.Result().(blend4go.StatusResponse).Status == "ok" {
+			return errors.New(res.Result().(blend4go.StatusResponse).Message)
+		}
+	} else {
+		return err
+	}
+	return nil
+}
+
+// Uninstall a specified repository id
+func UninstallID(g *blend4go.GalaxyInstance, id string, removeFromDisk bool) error {
+	config := repoInstallConfig{Id: id, RemoveFromDisk: removeFromDisk}
 	if res, err := g.R().SetBody(config).SetResult(blend4go.StatusResponse{}).Delete("/api/tool_shed_repositories/"); err == nil {
 		if res.Result().(blend4go.StatusResponse).Status == "ok" {
 			return errors.New(res.Result().(blend4go.StatusResponse).Message)

@@ -52,13 +52,14 @@ func NewUser(g *blend4go.GalaxyInstance, username, password, email string) (*Use
 
 // PUT /api/users/{id}
 func (u *User) Update() error {
-	return u.galaxyInstance.Put(u.Id, u)
+	_, err := u.galaxyInstance.Put(u)
+	return err
 }
 
 // delete the user with the given id
 func (u *User) Delete() error {
 	// DELETE /api/users/{id}
-	return u.galaxyInstance.Delete(u.Id, u)
+	return u.galaxyInstance.Delete(u)
 }
 
 // POST /api/users/deleted/{id}/undelete Undelete the user with the given id
