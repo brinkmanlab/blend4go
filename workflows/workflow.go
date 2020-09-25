@@ -1,6 +1,7 @@
 package workflows
 
 import (
+	"context"
 	"github.com/brinkmanlab/blend4go"
 	"github.com/brinkmanlab/blend4go/repositories"
 	"path"
@@ -62,8 +63,8 @@ func (w *StoredWorkflow) SetID(id blend4go.GalaxyID) {
 	w.Id = id
 }
 
-func NewStoredWorkflow(g *blend4go.GalaxyInstance, json string) (*StoredWorkflow, error) {
-	if res, err := g.R().SetResult(&StoredWorkflow{galaxyInstance: g}).SetBody(map[string]string{
+func NewStoredWorkflow(ctx context.Context, g *blend4go.GalaxyInstance, json string) (*StoredWorkflow, error) {
+	if res, err := g.R(ctx).SetResult(&StoredWorkflow{galaxyInstance: g}).SetBody(map[string]string{
 		"workflow": json,
 	}).Post(BasePath); err == nil {
 		return res.Result().(*StoredWorkflow), nil
@@ -76,13 +77,13 @@ func NewStoredWorkflow(g *blend4go.GalaxyInstance, json string) (*StoredWorkflow
 // instance (boolean) – true if fetch by Workflow ID instead of StoredWorkflow id, false by default.
 
 // Delete a specified workflow
-func (w *StoredWorkflow) Delete() error {
+func (w *StoredWorkflow) Delete(ctx context.Context) error {
 	// DELETE /api/workflows/{encoded_workflow_id}
-	return w.galaxyInstance.Delete(w)
+	return w.galaxyInstance.Delete(ctx, w)
 }
 
 // Update the specified workflow. If json == "", only the name, annotation, and show_in_tool_panel will be updated.
-func (w *StoredWorkflow) Update(json string) error {
+func (w *StoredWorkflow) Update(ctx context.Context, json string) error {
 	// PUT /api/workflows/{id}
 	body := make(map[string]string)
 	if w.ShowInToolPanel {
@@ -98,18 +99,18 @@ func (w *StoredWorkflow) Update(json string) error {
 	body["name"] = w.Name
 	body["annotation"] = w.Annotation
 
-	_, err := w.galaxyInstance.R().SetResult(w).SetBody(body).Put(path.Join(w.GetBasePath(), w.GetID()))
+	_, err := w.galaxyInstance.R(ctx).SetResult(w).SetBody(body).Put(path.Join(w.GetBasePath(), w.GetID()))
 	return err
 }
 
-func (w *StoredWorkflow) Download() (string, error) {
+func (w *StoredWorkflow) Download(ctx context.Context) (string, error) {
 	// GET /api/workflows/{encoded_workflow_id}/download
-	res, err := w.galaxyInstance.R().Get(path.Join(w.GetBasePath(), w.GetID(), "download"))
+	res, err := w.galaxyInstance.R(ctx).Get(path.Join(w.GetBasePath(), w.GetID(), "download"))
 	return res.String(), err
 }
 
-func (w *StoredWorkflow) Repositories() ([]repositories.Repository, error) {
-	if workflow, err := w.Download(); err == nil {
+func (w *StoredWorkflow) Repositories(ctx context.Context) ([]repositories.Repository, error) {
+	if workflow, err := w.Download(ctx); err == nil {
 		return Repositories(workflow)
 	} else {
 		return nil, err
@@ -117,7 +118,7 @@ func (w *StoredWorkflow) Repositories() ([]repositories.Repository, error) {
 }
 
 // Schedule the workflow specified by workflow_id to run.
-func (w *StoredWorkflow) Invoke() error {
+func (w *StoredWorkflow) Invoke(ctx context.Context) error {
 	// POST /api/workflows/{encoded_workflow_id}/invocations
 	panic("Implement me") // TODO
 }

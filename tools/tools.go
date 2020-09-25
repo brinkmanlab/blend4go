@@ -1,6 +1,7 @@
 package tools
 
 import (
+	"context"
 	"github.com/brinkmanlab/blend4go"
 	"path"
 )
@@ -8,16 +9,16 @@ import (
 const BasePath = "/api/tools"
 
 // returns a list of tools defined by parameters
-func List(g *blend4go.GalaxyInstance) ([]ToolSection, error) {
-	if res, err := g.R().SetResult([]Tool{}).Get(BasePath); err == nil {
+func List(ctx context.Context, g *blend4go.GalaxyInstance) ([]ToolSection, error) {
+	if res, err := g.R(ctx).SetResult([]Tool{}).Get(BasePath); err == nil {
 		return res.Result().([]ToolSection), nil
 	} else {
 		return nil, err
 	}
 }
 
-func Get(g *blend4go.GalaxyInstance, Id blend4go.GalaxyID) (*Tool, error) {
-	if res, err := g.R().SetResult(&Tool{}).Get(path.Join(BasePath, Id)); err == nil {
+func Get(ctx context.Context, g *blend4go.GalaxyInstance, Id blend4go.GalaxyID) (*Tool, error) {
+	if res, err := g.R(ctx).SetResult(&Tool{}).Get(path.Join(BasePath, Id)); err == nil {
 		return res.Result().(*Tool), nil
 	} else {
 		return nil, err

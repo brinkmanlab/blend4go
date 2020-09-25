@@ -1,6 +1,7 @@
 package blend4go
 
 import (
+	"context"
 	"github.com/go-resty/resty/v2"
 	"path"
 	"runtime/debug"
@@ -29,12 +30,12 @@ type GalaxyModel interface {
 }
 
 // returns an API key for authenticated user based on BaseAuth headers
-func GetAPIKey(host, username, password string) (string, error) {
+func GetAPIKey(ctx context.Context, host, username, password string) (string, error) {
 	r := resty.New()
 	r.SetHostURL(host)
 	r.SetHeader("Accept", "application/json")
 	r.SetBasicAuth(username, password)
-	if res, err := r.R().Get("/api/authenticate/baseauth"); err == nil {
+	if res, err := r.R().SetContext(ctx).Get("/api/authenticate/baseauth"); err == nil {
 		return res.Result().(map[string]string)["api_key"], nil
 	} else {
 		return "", err
@@ -57,8 +58,8 @@ func NewGalaxyInstance(host, apiKey string) (g *GalaxyInstance) {
 	return &GalaxyInstance{client: r}
 }
 
-func (g *GalaxyInstance) List(path string, models interface{}, params *map[string]string) (interface{}, error) {
-	r := g.client.R()
+func (g *GalaxyInstance) List(ctx context.Context, path string, models interface{}, params *map[string]string) (interface{}, error) {
+	r := g.R(ctx)
 	if params != nil {
 		r.SetQueryParams(*params)
 	}
@@ -75,8 +76,8 @@ func (g *GalaxyInstance) List(path string, models interface{}, params *map[strin
 	}
 }
 
-func (g *GalaxyInstance) Get(id GalaxyID, model GalaxyModel) (GalaxyModel, error) {
-	if res, err := g.client.R().SetResult(model).Get(path.Join(model.GetBasePath(), id)); err == nil {
+func (g *GalaxyInstance) Get(ctx context.Context, id GalaxyID, model GalaxyModel) (GalaxyModel, error) {
+	if res, err := g.R(ctx).SetResult(model).Get(path.Join(model.GetBasePath(), id)); err == nil {
 		m := res.Result().(GalaxyModel)
 		m.SetGalaxyInstance(g)
 		return m, nil
@@ -85,24 +86,24 @@ func (g *GalaxyInstance) Get(id GalaxyID, model GalaxyModel) (GalaxyModel, error
 	}
 }
 
-func (g *GalaxyInstance) Put(model GalaxyModel) (GalaxyModel, error) {
-	if res, err := g.R().SetResult(model).SetBody(model).Put(path.Join(model.GetBasePath(), model.GetID())); err == nil {
+func (g *GalaxyInstance) Put(ctx context.Context, model GalaxyModel) (GalaxyModel, error) {
+	if res, err := g.R(ctx).SetResult(model).SetBody(model).Put(path.Join(model.GetBasePath(), model.GetID())); err == nil {
 		return res.Result().(GalaxyModel), nil
 	} else {
 		return nil, err
 	}
 }
 
-func (g *GalaxyInstance) Delete(model GalaxyModel) error {
-	if _, err := g.R().Delete(path.Join(model.GetBasePath(), model.GetID())); err == nil {
+func (g *GalaxyInstance) Delete(ctx context.Context, model GalaxyModel) error {
+	if _, err := g.R(ctx).Delete(path.Join(model.GetBasePath(), model.GetID())); err == nil {
 		return err // TODO handle result. Status message?
 	} else {
 		return err
 	}
 }
 
-func (g *GalaxyInstance) R() GalaxyRequest {
-	return g.client.R()
+func (g *GalaxyInstance) R(ctx context.Context) GalaxyRequest {
+	return g.client.R().SetContext(ctx)
 }
 
 type ToolShed struct {

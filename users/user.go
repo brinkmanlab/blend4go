@@ -1,6 +1,7 @@
 package users
 
 import (
+	"context"
 	"github.com/brinkmanlab/blend4go"
 )
 
@@ -37,9 +38,9 @@ func (u *User) SetID(id blend4go.GalaxyID) {
 }
 
 // Creates a new Galaxy user.
-func NewUser(g *blend4go.GalaxyInstance, username, password, email string) (*User, error) {
+func NewUser(ctx context.Context, g *blend4go.GalaxyInstance, username, password, email string) (*User, error) {
 	//POST /api/users
-	if res, err := g.R().SetResult(&User{galaxyInstance: g}).SetBody(map[string]string{ // TODO reuse User struct?
+	if res, err := g.R(ctx).SetResult(&User{galaxyInstance: g}).SetBody(map[string]string{ // TODO reuse User struct?
 		"username": username,
 		"password": password,
 		"email":    email,
@@ -51,15 +52,15 @@ func NewUser(g *blend4go.GalaxyInstance, username, password, email string) (*Use
 }
 
 // PUT /api/users/{id}
-func (u *User) Update() error {
-	_, err := u.galaxyInstance.Put(u)
+func (u *User) Update(ctx context.Context) error {
+	_, err := u.galaxyInstance.Put(ctx, u)
 	return err
 }
 
 // delete the user with the given id
-func (u *User) Delete() error {
+func (u *User) Delete(ctx context.Context) error {
 	// DELETE /api/users/{id}
-	return u.galaxyInstance.Delete(u)
+	return u.galaxyInstance.Delete(ctx, u)
 }
 
 // POST /api/users/deleted/{id}/undelete Undelete the user with the given id

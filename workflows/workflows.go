@@ -1,6 +1,7 @@
 package workflows
 
 import (
+	"context"
 	"encoding/json"
 	"github.com/brinkmanlab/blend4go"
 	"github.com/brinkmanlab/blend4go/repositories"
@@ -17,7 +18,7 @@ hidden – if True, show hidden workflows
 deleted – if True, show deleted workflows
 missingTools – if True, include a list of missing tools per workflow
 */
-func List(g *blend4go.GalaxyInstance, published, hidden, deleted, missingTools bool) ([]StoredWorkflow, error) {
+func List(ctx context.Context, g *blend4go.GalaxyInstance, published, hidden, deleted, missingTools bool) ([]StoredWorkflow, error) {
 	q := make(map[string]string)
 	if published {
 		q["show_published"] = "True"
@@ -32,15 +33,15 @@ func List(g *blend4go.GalaxyInstance, published, hidden, deleted, missingTools b
 		q["missing_tools"] = "True"
 	}
 	// GET /api/workflows
-	res, err := g.List(BasePath, []StoredWorkflow{}, &q)
+	res, err := g.List(ctx, BasePath, []StoredWorkflow{}, &q)
 	return res.([]StoredWorkflow), err
 }
 
 // Displays information needed to run a workflow.
-func Get(g *blend4go.GalaxyInstance, id blend4go.GalaxyID) (*StoredWorkflow, error) {
+func Get(ctx context.Context, g *blend4go.GalaxyInstance, id blend4go.GalaxyID) (*StoredWorkflow, error) {
 	// TODO instance (boolean) – true if fetch by Workflow ID instead of StoredWorkflow id, false by default.
 	// GET /api/workflows/{encoded_workflow_id}
-	res, err := g.Get(id, &StoredWorkflow{})
+	res, err := g.Get(ctx, id, &StoredWorkflow{})
 	return res.(*StoredWorkflow), err
 }
 
