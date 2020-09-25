@@ -1,6 +1,12 @@
 package workflows
 
-import "github.com/brinkmanlab/blend4go"
+import (
+	"encoding/json"
+	"github.com/brinkmanlab/blend4go"
+	"github.com/brinkmanlab/blend4go/repositories"
+	"github.com/jmespath/go-jmespath"
+	"path"
+)
 
 const BasePath = "/api/workflows"
 
@@ -36,6 +42,66 @@ func Get(g *blend4go.GalaxyInstance, id blend4go.GalaxyID) (*StoredWorkflow, err
 	// GET /api/workflows/{encoded_workflow_id}
 	res, err := g.Get(id, &StoredWorkflow{})
 	return res.(*StoredWorkflow), err
+}
+
+// Recursively search for all tool ids in workflow
+func findToolIDs(data interface{}) ([]repositories.Repository, error) {
+	var res []repositories.Repository
+
+	// Search subworkflows
+	// This can be replaced by a recursive query when added to JMESPath https://github.com/jmespath/jmespath.py/issues/110
+	if subworkflows, err := jmespath.Search("steps.*.subworkflow", data); err == nil {
+		for subworkflow := range subworkflows.([]interface{}) {
+			if ids, err := findToolIDs(subworkflow); err == nil {
+				res = append(res, ids...)
+			} else {
+				return nil, err
+			}
+		}
+	} else {
+		return nil, err
+	}
+
+	// Append repositories
+	if repos, err := jmespath.Search("steps.*.tool_shed_repository", data); err == nil {
+		for _, repo := range repos.([]map[string]string) {
+			res = append(res, repositories.Repository{
+				Name:              repo["name"],
+				ToolShed:          repo["tool_shed"],
+				Owner:             repo["owner"],
+				ChangesetRevision: repo["changeset_revision"],
+			})
+		}
+	} else {
+		return nil, err
+	}
+
+	return res, nil
+}
+
+func Repositories(workflow string) ([]repositories.Repository, error) {
+	var data interface{}
+
+	if err := json.Unmarshal([]byte(workflow), data); err != nil {
+		return nil, err
+	}
+
+	// Search for all tool ids in workflow json
+	if res, err := findToolIDs(data); err == nil {
+		// Reduce to unique values
+		set := make(map[string]repositories.Repository)
+		for _, i := range res {
+			set[path.Join(i.ToolShed, i.Owner, i.Name, i.ChangesetRevision)] = i
+		}
+		// Convert keys to list
+		tools := make([]repositories.Repository, len(set))
+		for _, i := range set {
+			tools = append(tools, i)
+		}
+		return tools, nil
+	} else {
+		return nil, err
+	}
 }
 
 // Get workflows present in the tools panel GET /api/workflows/menu
