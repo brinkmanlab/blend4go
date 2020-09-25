@@ -16,7 +16,7 @@ func List(g *blend4go.GalaxyInstance) ([]Repository, error) {
 }
 
 type repoInstallConfig struct {
-	Id                            blend4go.GalaxyID `json:",omitempty"`
+	Id                            blend4go.GalaxyID `json:"id,omitempty"`
 	ToolShedUrl                   string            `json:"tool_shed_url"`
 	Name                          string            `json:"name"`
 	Owner                         string            `json:"owner"`

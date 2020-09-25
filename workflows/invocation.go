@@ -4,17 +4,17 @@ import "github.com/brinkmanlab/blend4go"
 
 type WorkflowInvocation struct {
 	galaxyInstance *blend4go.GalaxyInstance
-	Id             blend4go.GalaxyID `json:"id"`
-	UpdateTime     string            `json:"update_time"`
-	Uuid           string            `json:"uuid"`
-	// Outputs ? `json:"outputs"`
-	// Output_collections ? `json:"output_collections"`
-	HistoryId  blend4go.GalaxyID `json:"history_id"`
-	WorkflowId blend4go.GalaxyID `json:"workflow_id"`
-	State      string            `json:"state"`
-	ModelClass string            `json:"model_class"`
-	// Inputs ? `json:"inputs"`
-	Steps []WorkflowInvocationStep `json:"steps"`
+	Id             blend4go.GalaxyID `json:"id,omitempty"`
+	UpdateTime     string            `json:"update_time,omitempty"`
+	Uuid           string            `json:"uuid,omitempty"`
+	// Outputs ? `json:"outputs,omitempty"`
+	// Output_collections ? `json:"output_collections,omitempty"`
+	HistoryId  blend4go.GalaxyID `json:"history_id,omitempty"`
+	WorkflowId blend4go.GalaxyID `json:"workflow_id,omitempty"`
+	State      string            `json:"state,omitempty"`
+	ModelClass string            `json:"model_class,omitempty"`
+	// Inputs ? `json:"inputs,omitempty"`
+	Steps []WorkflowInvocationStep `json:"steps,omitempty"`
 }
 
 func (w *WorkflowInvocation) GetBasePath() string {

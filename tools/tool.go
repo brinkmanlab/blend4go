@@ -3,11 +3,11 @@ package tools
 import "github.com/brinkmanlab/blend4go"
 
 type ToolSection struct {
-	Id         string `json:"id"`
-	Name       string `json:"name"`
-	Version    string `json:"version"`
-	ModelClass string `json:"model_class"`
-	Elems      []Tool `json:"elems"`
+	Id         string `json:"id,omitempty"`
+	Name       string `json:"name,omitempty"`
+	Version    string `json:"version,omitempty"`
+	ModelClass string `json:"model_class,omitempty"`
+	Elems      []Tool `json:"elems,omitempty"`
 }
 
 func (t *ToolSection) GetID() blend4go.GalaxyID {
@@ -20,21 +20,21 @@ func (t *ToolSection) SetID(id blend4go.GalaxyID) {
 
 type Tool struct {
 	galaxyInstance   *blend4go.GalaxyInstance
-	Id               string   `json:"id"`
-	Name             string   `json:"name"`
-	Version          string   `json:"version"`
-	MinWidth         int      `json:"min_width"`
-	Target           string   `json:"target"`
-	Link             string   `json:"link"`
-	PanelSectionId   string   `json:"panel_section_id"`
-	EdamTopics       []string `json:"edam_topics"`
-	FormStyle        string   `json:"form_style"`
-	EdamOperations   []string `json:"edam_operations"`
-	Labels           []string `json:"labels"`
-	Description      string   `json:"description"`
-	ConfigFile       string   `json:"config_file"`
-	Xrefs            []string `json:"xrefs"`
-	PanelSectionName string   `json:"panel_section_name"`
+	Id               string   `json:"id,omitempty"`
+	Name             string   `json:"name,omitempty"`
+	Version          string   `json:"version,omitempty"`
+	MinWidth         int      `json:"min_width,omitempty"`
+	Target           string   `json:"target,omitempty"`
+	Link             string   `json:"link,omitempty"`
+	PanelSectionId   string   `json:"panel_section_id,omitempty"`
+	EdamTopics       []string `json:"edam_topics,omitempty"`
+	FormStyle        string   `json:"form_style,omitempty"`
+	EdamOperations   []string `json:"edam_operations,omitempty"`
+	Labels           []string `json:"labels,omitempty"`
+	Description      string   `json:"description,omitempty"`
+	ConfigFile       string   `json:"config_file,omitempty"`
+	Xrefs            []string `json:"xrefs,omitempty"`
+	PanelSectionName string   `json:"panel_section_name,omitempty"`
 }
 
 func (t *Tool) GetID() blend4go.GalaxyID {

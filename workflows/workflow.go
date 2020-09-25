@@ -2,6 +2,8 @@ package workflows
 
 import (
 	"github.com/brinkmanlab/blend4go"
+	"github.com/brinkmanlab/blend4go/repositories"
+	"path"
 )
 
 type StoredWorkflowInput struct {
@@ -16,32 +18,32 @@ type StoredWorkflowInputStep struct {
 }
 
 type StoredWorkflowStep struct {
-	ToolId      string `json:"tool_id"`
-	ToolVersion string `json:"tool_version"`
-	Id          uint   `json:"id"`
-	InputSteps  []StoredWorkflowInputStep
-	// ToolInputs	? `json:"tool_inputs"` TODO?
-	Type       string `json:"type"`
-	Annotation string `json:"annotation"`
+	ToolId      string                    `json:"tool_id,omitempty"`
+	ToolVersion string                    `json:"tool_version,omitempty"`
+	Id          uint                      `json:"id,omitempty"`
+	InputSteps  []StoredWorkflowInputStep `json:"input_steps,omitempty"`
+	// ToolInputs	? `json:"tool_inputs,omitempty"` TODO?
+	Type       string `json:"type,omitempty"`
+	Annotation string `json:"annotation,omitempty"`
 }
 
 type StoredWorkflow struct {
 	galaxyInstance     *blend4go.GalaxyInstance
-	Id                 blend4go.GalaxyID        `json:"id"`
-	Name               string                   `json:"name"`
-	Tags               []string                 `json:"tags"`
-	Deleted            bool                     `json:"deleted"`
-	LatestWorkflowUuid string                   `json:"latest_workflow_uuid"`
-	ShowInToolPanel    bool                     `json:"show_in_tool_panel"`
-	Url                string                   `json:"url"`
-	NumberOfSteps      uint                     `json:"number_of_steps"`
-	Published          bool                     `json:"published"`
-	Owner              string                   `json:"owner"`
-	ModelClass         string                   `json:"model_class"`
-	Inputs             []StoredWorkflowInput    `json:"inputs"`
-	Annotation         string                   `json:"annotation"`
-	Version            uint                     `json:"version"`
-	Steps              []WorkflowInvocationStep `json:"steps"`
+	Id                 blend4go.GalaxyID        `json:"id,omitempty"`
+	Name               string                   `json:"name,omitempty"`
+	Tags               []string                 `json:"tags,omitempty"`
+	Deleted            bool                     `json:"deleted,omitempty"`
+	LatestWorkflowUuid string                   `json:"latest_workflow_uuid,omitempty"`
+	ShowInToolPanel    bool                     `json:"show_in_tool_panel,omitempty"`
+	Url                string                   `json:"url,omitempty"`
+	NumberOfSteps      uint                     `json:"number_of_steps,omitempty"`
+	Published          bool                     `json:"published,omitempty"`
+	Owner              string                   `json:"owner,omitempty"`
+	ModelClass         string                   `json:"model_class,omitempty"`
+	Inputs             []StoredWorkflowInput    `json:"inputs,omitempty"`
+	Annotation         string                   `json:"annotation,omitempty"`
+	Version            uint                     `json:"version,omitempty"`
+	Steps              []WorkflowInvocationStep `json:"steps,omitempty"`
 }
 
 func (w *StoredWorkflow) GetBasePath() string {

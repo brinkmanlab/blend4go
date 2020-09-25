@@ -23,7 +23,7 @@ type GalaxyInstance struct {
 
 type GalaxyModel interface {
 	GetBasePath() string
-	SetGalaxyInstance(instance *GalaxyInstance)
+	SetGalaxyInstance(*GalaxyInstance)
 	GetID() GalaxyID
 	SetID(GalaxyID)
 }

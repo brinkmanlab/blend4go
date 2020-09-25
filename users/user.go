@@ -6,18 +6,18 @@ import (
 
 type User struct {
 	galaxyInstance *blend4go.GalaxyInstance
-	Id             blend4go.GalaxyID `json:"id"`
-	Username       string            `json:"username"`
-	QuotaPercent   uint              `json:"quota_percent"`
-	//Preferences ? `json:"preferences"`
-	TotalDiskUsage     uint     `json:"total_disk_usage"`
-	Deleted            bool     `json:"deleted"`
-	Purged             bool     `json:"purged"`
-	NiceTotalDiskUsage string   `json:"nice_total_disk_usage"`
-	Quota              uint     `json:"quota"`
-	Email              string   `json:"email"`
-	IsAdmin            bool     `json:"is_admin"`
-	TagsUsed           []string `json:"tags_used"`
+	Id             blend4go.GalaxyID `json:"id,omitempty"`
+	Username       string            `json:"username,omitempty"`
+	QuotaPercent   uint              `json:"quota_percent,omitempty"`
+	//Preferences ? `json:"preferences,omitempty"`
+	TotalDiskUsage     uint     `json:"total_disk_usage,omitempty"`
+	Deleted            bool     `json:"deleted,omitempty"`
+	Purged             bool     `json:"purged,omitempty"`
+	NiceTotalDiskUsage string   `json:"nice_total_disk_usage,omitempty"`
+	Quota              uint     `json:"quota,omitempty"`
+	Email              string   `json:"email,omitempty"`
+	IsAdmin            bool     `json:"is_admin,omitempty"`
+	TagsUsed           []string `json:"tags_used,omitempty"`
 }
 
 func (u *User) GetBasePath() string {
