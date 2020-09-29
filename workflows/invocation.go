@@ -14,7 +14,7 @@ type WorkflowInvocation struct {
 	State      string            `json:"state,omitempty"`
 	ModelClass string            `json:"model_class,omitempty"`
 	// Inputs ? `json:"inputs,omitempty"`
-	Steps []WorkflowInvocationStep `json:"steps,omitempty"`
+	Steps []*WorkflowInvocationStep `json:"steps,omitempty"`
 }
 
 func (w *WorkflowInvocation) GetBasePath() string {

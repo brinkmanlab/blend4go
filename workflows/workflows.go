@@ -18,7 +18,7 @@ hidden – if True, show hidden workflows
 deleted – if True, show deleted workflows
 missingTools – if True, include a list of missing tools per workflow
 */
-func List(ctx context.Context, g *blend4go.GalaxyInstance, published, hidden, deleted, missingTools bool) ([]StoredWorkflow, error) {
+func List(ctx context.Context, g *blend4go.GalaxyInstance, published, hidden, deleted, missingTools bool) ([]*StoredWorkflow, error) {
 	q := make(map[string]string)
 	if published {
 		q["show_published"] = "True"
@@ -33,8 +33,8 @@ func List(ctx context.Context, g *blend4go.GalaxyInstance, published, hidden, de
 		q["missing_tools"] = "True"
 	}
 	// GET /api/workflows
-	res, err := g.List(ctx, BasePath, []StoredWorkflow{}, &q)
-	return res.([]StoredWorkflow), err
+	res, err := g.List(ctx, BasePath, []*StoredWorkflow{}, &q)
+	return res.([]*StoredWorkflow), err
 }
 
 // Displays information needed to run a workflow.
@@ -46,8 +46,8 @@ func Get(ctx context.Context, g *blend4go.GalaxyInstance, id blend4go.GalaxyID) 
 }
 
 // Recursively search for all tool ids in workflow
-func findToolIDs(data interface{}) ([]repositories.Repository, error) {
-	var res []repositories.Repository
+func findToolIDs(data interface{}) ([]*repositories.Repository, error) {
+	var res []*repositories.Repository
 
 	// Search subworkflows
 	// This can be replaced by a recursive query when added to JMESPath https://github.com/jmespath/jmespath.py/issues/110
@@ -66,7 +66,7 @@ func findToolIDs(data interface{}) ([]repositories.Repository, error) {
 	// Append repositories
 	if repos, err := jmespath.Search("steps.*.tool_shed_repository", data); err == nil {
 		for _, repo := range repos.([]map[string]string) {
-			res = append(res, repositories.Repository{
+			res = append(res, &repositories.Repository{
 				Name:              repo["name"],
 				ToolShed:          repo["tool_shed"],
 				Owner:             repo["owner"],
@@ -80,7 +80,7 @@ func findToolIDs(data interface{}) ([]repositories.Repository, error) {
 	return res, nil
 }
 
-func Repositories(workflow string) ([]repositories.Repository, error) {
+func Repositories(workflow string) ([]*repositories.Repository, error) {
 	var data interface{}
 
 	if err := json.Unmarshal([]byte(workflow), data); err != nil {
@@ -90,12 +90,12 @@ func Repositories(workflow string) ([]repositories.Repository, error) {
 	// Search for all tool ids in workflow json
 	if res, err := findToolIDs(data); err == nil {
 		// Reduce to unique values
-		set := make(map[string]repositories.Repository)
+		set := make(map[string]*repositories.Repository)
 		for _, i := range res {
 			set[path.Join(i.ToolShed, i.Owner, i.Name, i.ChangesetRevision)] = i
 		}
 		// Convert keys to list
-		tools := make([]repositories.Repository, len(set))
+		tools := make([]*repositories.Repository, len(set))
 		for _, i := range set {
 			tools = append(tools, i)
 		}

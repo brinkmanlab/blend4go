@@ -8,9 +8,9 @@ import (
 
 const BasePath = "/api/tool_shed_repositories"
 
-func List(ctx context.Context, g *blend4go.GalaxyInstance) ([]Repository, error) {
-	if res, err := g.List(ctx, BasePath, []Repository{}, nil); err == nil {
-		return res.([]Repository), nil
+func List(ctx context.Context, g *blend4go.GalaxyInstance) ([]*Repository, error) {
+	if res, err := g.List(ctx, BasePath, []*Repository{}, nil); err == nil {
+		return res.([]*Repository), nil
 	} else {
 		return nil, err
 	}

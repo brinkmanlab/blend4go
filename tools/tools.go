@@ -8,9 +8,9 @@ import (
 const BasePath = "/api/tools"
 
 // returns a list of tools defined by parameters
-func List(ctx context.Context, g *blend4go.GalaxyInstance) ([]ToolSection, error) {
-	if res, err := g.R(ctx).SetResult([]Tool{}).Get(BasePath); err == nil {
-		return res.Result().([]ToolSection), nil
+func List(ctx context.Context, g *blend4go.GalaxyInstance) ([]*ToolSection, error) {
+	if res, err := g.R(ctx).SetResult([]*ToolSection{}).Get(BasePath); err == nil {
+		return res.Result().([]*ToolSection), nil
 	} else {
 		return nil, err
 	}

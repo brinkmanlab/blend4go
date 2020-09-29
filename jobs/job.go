@@ -39,14 +39,14 @@ func (j *Job) SetID(id blend4go.GalaxyID) {
 }
 
 type invocationResponse struct {
-	Jobs                []Job                                           `json:"jobs"`
-	Outputs             []histories.HistoryDatasetAssociation           `json:"outputs"`
-	OutputCollections   []histories.HistoryDatasetCollectionAssociation `json:"output_collections"`
-	ImplicitCollections []histories.HistoryDatasetCollectionAssociation `json:"implicit_collections"`
+	Jobs                []*Job                                           `json:"jobs"`
+	Outputs             []*histories.HistoryDatasetAssociation           `json:"outputs"`
+	OutputCollections   []*histories.HistoryDatasetCollectionAssociation `json:"output_collections"`
+	ImplicitCollections []*histories.HistoryDatasetCollectionAssociation `json:"implicit_collections"`
 }
 
 // Execute tool with a given parameter payload
-func NewJob(ctx context.Context, g *blend4go.GalaxyInstance, payload map[string]interface{}) ([]Job, []histories.HistoryDatasetAssociation, []histories.HistoryDatasetCollectionAssociation, []histories.HistoryDatasetCollectionAssociation, error) {
+func NewJob(ctx context.Context, g *blend4go.GalaxyInstance, payload map[string]interface{}) ([]*Job, []*histories.HistoryDatasetAssociation, []*histories.HistoryDatasetCollectionAssociation, []*histories.HistoryDatasetCollectionAssociation, error) {
 	//POST /api/tools
 	if res, err := g.R(ctx).SetBody(payload).SetResult(&invocationResponse{}).Post("/api/tools"); err == nil {
 		r := res.Result().(invocationResponse)

@@ -3,11 +3,11 @@ package tools
 import "github.com/brinkmanlab/blend4go"
 
 type ToolSection struct {
-	Id         string `json:"id,omitempty"`
-	Name       string `json:"name,omitempty"`
-	Version    string `json:"version,omitempty"`
-	ModelClass string `json:"model_class,omitempty"`
-	Elems      []Tool `json:"elems,omitempty"`
+	Id         string  `json:"id,omitempty"`
+	Name       string  `json:"name,omitempty"`
+	Version    string  `json:"version,omitempty"`
+	ModelClass string  `json:"model_class,omitempty"`
+	Elems      []*Tool `json:"elems,omitempty"`
 }
 
 func (t *ToolSection) GetID() blend4go.GalaxyID {
