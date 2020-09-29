@@ -1,9 +1,5 @@
 package histories
 
-type HistoryDatasetAssociation struct{}
-type HistoryDatasetCollectionAssociation struct {
-}
-
 // GET /api/histories/{history_id}/contents
 
 // GET /api/histories/{history_id}/contents/{id}
