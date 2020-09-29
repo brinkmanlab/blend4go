@@ -45,8 +45,9 @@ type invocationResponse struct {
 	ImplicitCollections []histories.HistoryDatasetCollectionAssociation `json:"implicit_collections"`
 }
 
+// Execute tool with a given parameter payload
 func NewJob(ctx context.Context, g *blend4go.GalaxyInstance, payload map[string]interface{}) ([]Job, []histories.HistoryDatasetAssociation, []histories.HistoryDatasetCollectionAssociation, []histories.HistoryDatasetCollectionAssociation, error) {
-	//POST /api/tools Execute tool with a given parameter payload
+	//POST /api/tools
 	if res, err := g.R(ctx).SetBody(payload).SetResult(&invocationResponse{}).Post("/api/tools"); err == nil {
 		r := res.Result().(invocationResponse)
 		return r.Jobs, r.Outputs, r.OutputCollections, r.ImplicitCollections, err
@@ -55,11 +56,15 @@ func NewJob(ctx context.Context, g *blend4go.GalaxyInstance, payload map[string]
 	}
 }
 
+// Delete or stop a job
 func (j *Job) Delete(ctx context.Context) error {
+	//Delete /api/jobs/{id}
 	return j.galaxyInstance.Delete(ctx, j)
 }
 
+// Resume paused job
 func (j *Job) Resume(ctx context.Context) error {
+	//PUT /api/jobs/{id}/resume
 	_, err := j.galaxyInstance.R(ctx).Put(path.Join(j.GetBasePath(), j.GetID(), "resume"))
 	return err
 }
@@ -67,8 +72,6 @@ func (j *Job) Resume(ctx context.Context) error {
 //GET /api/jobs/{id}/common_problems
 //GET /api/jobs/{id}/inputs
 //GET /api/jobs/{id}/outputs
-//Delete /api/jobs/{id}
-//PUT /api/jobs/{id}/resume
 //GET /api/jobs/{job_id}/metrics
 //GET /api/jobs/{job_id}/destination_params
 //GET /api/jobs/{job_id}/parameters_display
