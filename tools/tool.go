@@ -37,6 +37,14 @@ type Tool struct {
 	PanelSectionName string   `json:"panel_section_name,omitempty"`
 }
 
+func (t *Tool) GetBasePath() string {
+	return BasePath
+}
+
+func (t *Tool) SetGalaxyInstance(g *blend4go.GalaxyInstance) {
+	t.galaxyInstance = g
+}
+
 func (t *Tool) GetID() blend4go.GalaxyID {
 	return t.Id
 }
@@ -70,4 +78,3 @@ func (t *Tool) UninstallDependencies() error {
 //GET /api/tools/{tool_id}/test_data_download?tool_version={tool_version}&filename={filename}
 //GET /api/tools/{tool_id}/test_data?tool_version={tool_version}
 //GET /api/tools/{tool_id}/requirements Return the resolver status for a specific tool id. [{“status”: “installed”, “name”: “hisat2”, “versionless”: false, “resolver_type”: “conda”, “version”: “2.0.3”, “type”: “package”}]
-//POST /api/tools Execute tool with a given parameter payload
