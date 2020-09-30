@@ -19,7 +19,7 @@ type StatusResponse struct {
 }
 
 type GalaxyInstance struct {
-	client *resty.Client
+	Client *resty.Client
 }
 
 type GalaxyModel interface {
@@ -55,7 +55,7 @@ func NewGalaxyInstance(host, apiKey string) (g *GalaxyInstance) {
 		"Content-Type": "application/json",
 		"User-Agent":   agent,
 	})
-	return &GalaxyInstance{client: r}
+	return &GalaxyInstance{Client: r}
 }
 
 func (g *GalaxyInstance) List(ctx context.Context, path string, models interface{}, params *map[string]string) (interface{}, error) {
@@ -103,7 +103,7 @@ func (g *GalaxyInstance) Delete(ctx context.Context, model GalaxyModel) error {
 }
 
 func (g *GalaxyInstance) R(ctx context.Context) GalaxyRequest {
-	return g.client.R().SetContext(ctx)
+	return g.Client.R().SetContext(ctx)
 }
 
 type ToolShed struct {
