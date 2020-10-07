@@ -109,9 +109,13 @@ type ToolShed struct {
 	Url  string `json:"url"`
 }
 
-func (g *GalaxyInstance) ToolSheds() []ToolShed {
+func (g *GalaxyInstance) ToolSheds(ctx context.Context) ([]*ToolShed, error) {
 	//GET /api/tool_shed Interact with the Toolshed registry of this instance.
-	return nil
+	if res, err := g.R(ctx).SetResult([]*ToolShed{}).Get("/api/tool_shed"); err == nil {
+		return res.Result().([]*ToolShed), nil
+	} else {
+		return nil, err
+	}
 }
 
 //GET /api/tool_shed/request
