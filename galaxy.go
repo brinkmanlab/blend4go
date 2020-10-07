@@ -51,10 +51,8 @@ func NewGalaxyInstance(host, apiKey string) (g *GalaxyInstance) {
 	r.SetHostURL(host)
 	r.SetHeader("X-AUTH-KEY", apiKey)
 	r.SetHeader("Accept", "application/json")
-	r.SetHeaders(map[string]string{
-		"Content-Type": "application/json",
-		"User-Agent":   agent,
-	})
+	r.SetHeader("Content-Type", "application/json")
+	r.SetHeader("User-Agent", agent)
 	return &GalaxyInstance{Client: r}
 }
 
