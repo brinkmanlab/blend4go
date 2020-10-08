@@ -18,7 +18,7 @@ func List(ctx context.Context, g *blend4go.GalaxyInstance) ([]*Job, error) {
 
 func Get(ctx context.Context, g *blend4go.GalaxyInstance, id blend4go.GalaxyID) (*Job, error) {
 	//GET /api/jobs/{id}
-	if res, err := g.Get(ctx, id, &Job{}); err == nil {
+	if res, err := g.Get(ctx, id, &Job{}, nil); err == nil {
 		return res.(*Job), nil
 	} else {
 		return nil, err

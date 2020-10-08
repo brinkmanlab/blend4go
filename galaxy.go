@@ -74,8 +74,12 @@ func (g *GalaxyInstance) List(ctx context.Context, path string, models interface
 	}
 }
 
-func (g *GalaxyInstance) Get(ctx context.Context, id GalaxyID, model GalaxyModel) (GalaxyModel, error) {
-	if res, err := g.R(ctx).SetResult(model).Get(path.Join(model.GetBasePath(), id)); err == nil {
+func (g *GalaxyInstance) Get(ctx context.Context, id GalaxyID, model GalaxyModel, params *map[string]string) (GalaxyModel, error) {
+	r := g.R(ctx)
+	if params != nil {
+		r.SetQueryParams(*params)
+	}
+	if res, err := r.SetResult(model).Get(path.Join(model.GetBasePath(), id)); err == nil {
 		m := res.Result().(GalaxyModel)
 		m.SetGalaxyInstance(g)
 		return m, nil
@@ -84,16 +88,24 @@ func (g *GalaxyInstance) Get(ctx context.Context, id GalaxyID, model GalaxyModel
 	}
 }
 
-func (g *GalaxyInstance) Put(ctx context.Context, model GalaxyModel) (GalaxyModel, error) {
-	if res, err := g.R(ctx).SetResult(model).SetBody(model).Put(path.Join(model.GetBasePath(), model.GetID())); err == nil {
+func (g *GalaxyInstance) Put(ctx context.Context, model GalaxyModel, params *map[string]string) (GalaxyModel, error) {
+	r := g.R(ctx)
+	if params != nil {
+		r.SetQueryParams(*params)
+	}
+	if res, err := r.SetResult(model).SetBody(model).Put(path.Join(model.GetBasePath(), model.GetID())); err == nil {
 		return res.Result().(GalaxyModel), nil
 	} else {
 		return nil, err
 	}
 }
 
-func (g *GalaxyInstance) Delete(ctx context.Context, model GalaxyModel) error {
-	if _, err := g.R(ctx).Delete(path.Join(model.GetBasePath(), model.GetID())); err == nil {
+func (g *GalaxyInstance) Delete(ctx context.Context, model GalaxyModel, params *map[string]string) error {
+	r := g.R(ctx)
+	if params != nil {
+		r.SetQueryParams(*params)
+	}
+	if _, err := r.Delete(path.Join(model.GetBasePath(), model.GetID())); err == nil {
 		return err // TODO handle result. Status message?
 	} else {
 		return err

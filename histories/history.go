@@ -65,7 +65,7 @@ func (h *History) NewHistory(ctx context.Context, g *blend4go.GalaxyInstance, na
 // Delete the history with the given id
 func (h *History) Delete(ctx context.Context) error {
 	// DELETE /api/histories/{id}
-	return h.galaxyInstance.Delete(ctx, h)
+	return h.galaxyInstance.Delete(ctx, h, nil)
 }
 
 // Undelete history (that hasn’t been purged) with the given id
@@ -78,7 +78,7 @@ func (h *History) Undelete(ctx context.Context) error {
 // Update the values for the history
 func (h *History) Update(ctx context.Context) error {
 	// PUT /api/histories/{id}
-	_, err := h.galaxyInstance.Put(ctx, h)
+	_, err := h.galaxyInstance.Put(ctx, h, nil)
 	return err
 }
 

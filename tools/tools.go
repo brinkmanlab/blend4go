@@ -17,7 +17,7 @@ func List(ctx context.Context, g *blend4go.GalaxyInstance) ([]*ToolSection, erro
 }
 
 func Get(ctx context.Context, g *blend4go.GalaxyInstance, id blend4go.GalaxyID) (*Tool, error) {
-	if res, err := g.Get(ctx, id, &Tool{}); err == nil {
+	if res, err := g.Get(ctx, id, &Tool{}, nil); err == nil {
 		return res.(*Tool), nil
 	} else {
 		return nil, err

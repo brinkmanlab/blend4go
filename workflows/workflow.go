@@ -79,7 +79,7 @@ func NewStoredWorkflow(ctx context.Context, g *blend4go.GalaxyInstance, json str
 // Delete a specified workflow
 func (w *StoredWorkflow) Delete(ctx context.Context) error {
 	// DELETE /api/workflows/{encoded_workflow_id}
-	return w.galaxyInstance.Delete(ctx, w)
+	return w.galaxyInstance.Delete(ctx, w, nil)
 }
 
 // Update the specified workflow. If json == "", only the name, annotation, and show_in_tool_panel will be updated.

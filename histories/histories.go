@@ -47,7 +47,7 @@ func GetSharedWithMe(ctx context.Context, g *blend4go.GalaxyInstance) ([]History
 // Get the history with id
 func Get(ctx context.Context, g *blend4go.GalaxyInstance, id blend4go.GalaxyID) (*History, error) {
 	//GET /api/histories/{id}
-	if res, err := g.Get(ctx, id, &History{}); err == nil {
+	if res, err := g.Get(ctx, id, &History{}, nil); err == nil {
 		return res.(*History), nil
 	} else {
 		return nil, err

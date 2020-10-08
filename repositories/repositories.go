@@ -17,7 +17,7 @@ func List(ctx context.Context, g *blend4go.GalaxyInstance) ([]*Repository, error
 }
 
 func Get(ctx context.Context, g *blend4go.GalaxyInstance, id blend4go.GalaxyID) (*Repository, error) {
-	if res, err := g.Get(ctx, id, &Repository{}); err == nil {
+	if res, err := g.Get(ctx, id, &Repository{}, nil); err == nil {
 		return res.(*Repository), nil
 	} else {
 		return nil, err
@@ -47,6 +47,7 @@ func Install(ctx context.Context, g *blend4go.GalaxyInstance, toolShedUrl string
 		// Ensure only one is non-empty
 		newToolPanelSectionLabel = ""
 	}
+	// TODO changeset_revision == "" ? install latest
 	config := repoInstallConfig{ToolShedUrl: toolShedUrl, Name: name, Owner: owner, ChangesetRevision: changesetRevision, InstallToolDependencies: installToolDependencies, InstallRepositoryDependencies: installRepositoryDependencies, InstallResolverDependencies: installResolverDependencies, ToolPanelSectionId: toolPanelSectionId, NewToolPanelSectionLabel: newToolPanelSectionLabel}
 	if res, err := g.R(ctx).SetBody(config).SetResult(blend4go.StatusResponse{}).Post("/api/tool_shed_repositories/install_repository_revision"); err == nil {
 		if res.Result().(blend4go.StatusResponse).Status == "ok" {

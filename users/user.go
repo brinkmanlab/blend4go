@@ -53,14 +53,14 @@ func NewUser(ctx context.Context, g *blend4go.GalaxyInstance, username, password
 
 // PUT /api/users/{id}
 func (u *User) Update(ctx context.Context) error {
-	_, err := u.galaxyInstance.Put(ctx, u)
+	_, err := u.galaxyInstance.Put(ctx, u, nil)
 	return err
 }
 
 // delete the user with the given id
 func (u *User) Delete(ctx context.Context) error {
 	// DELETE /api/users/{id}
-	return u.galaxyInstance.Delete(ctx, u)
+	return u.galaxyInstance.Delete(ctx, u, nil)
 }
 
 // POST /api/users/deleted/{id}/undelete Undelete the user with the given id

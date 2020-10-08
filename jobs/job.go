@@ -59,7 +59,7 @@ func NewJob(ctx context.Context, g *blend4go.GalaxyInstance, payload map[string]
 // Delete or stop a job
 func (j *Job) Delete(ctx context.Context) error {
 	//Delete /api/jobs/{id}
-	return j.galaxyInstance.Delete(ctx, j)
+	return j.galaxyInstance.Delete(ctx, j, nil)
 }
 
 // Resume paused job
