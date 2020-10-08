@@ -63,9 +63,13 @@ func (h *History) NewHistory(ctx context.Context, g *blend4go.GalaxyInstance, na
 // GET /api/histories/{id}/citations Return all the citations for the tools used to produce the datasets in the history.
 
 // Delete the history with the given id
-func (h *History) Delete(ctx context.Context) error {
+func (h *History) Delete(ctx context.Context, purge bool) error {
 	// DELETE /api/histories/{id}
-	return h.galaxyInstance.Delete(ctx, h, nil)
+	if purge {
+		return h.galaxyInstance.Delete(ctx, h, &map[string]string{"purge": "True"})
+	} else {
+		return h.galaxyInstance.Delete(ctx, h, nil)
+	}
 }
 
 // Undelete history (that hasn’t been purged) with the given id
