@@ -20,8 +20,9 @@ func TestGalaxyInstance_Delete(t *testing.T) {
 		Client *resty.Client
 	}
 	type args struct {
-		ctx   context.Context
-		model blend4go.GalaxyModel
+		ctx    context.Context
+		model  blend4go.GalaxyModel
+		params *map[string]string
 	}
 	tests := []struct {
 		name    string
@@ -34,7 +35,7 @@ func TestGalaxyInstance_Delete(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			g := test_util.NewTestInstance()
-			if err := g.Delete(tt.args.ctx, tt.args.model); (err != nil) != tt.wantErr {
+			if err := g.Delete(tt.args.ctx, tt.args.model, tt.args.params); (err != nil) != tt.wantErr {
 				t.Errorf("Delete() error = %v, wantErr %v", err, tt.wantErr)
 			}
 		})
@@ -43,9 +44,10 @@ func TestGalaxyInstance_Delete(t *testing.T) {
 
 func TestGalaxyInstance_Get(t *testing.T) {
 	type args struct {
-		ctx   context.Context
-		id    blend4go.GalaxyID
-		model blend4go.GalaxyModel
+		ctx    context.Context
+		id     blend4go.GalaxyID
+		model  blend4go.GalaxyModel
+		params *map[string]string
 	}
 	tests := []struct {
 		name    string
@@ -58,7 +60,7 @@ func TestGalaxyInstance_Get(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			g := test_util.NewTestInstance()
-			got, err := g.Get(tt.args.ctx, tt.args.id, tt.args.model)
+			got, err := g.Get(tt.args.ctx, tt.args.id, tt.args.model, tt.args.params)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("Get() error = %v, wantErr %v", err, tt.wantErr)
 				return
@@ -104,8 +106,9 @@ func TestGalaxyInstance_Put(t *testing.T) {
 	type fields struct {
 	}
 	type args struct {
-		ctx   context.Context
-		model blend4go.GalaxyModel
+		ctx    context.Context
+		model  blend4go.GalaxyModel
+		params *map[string]string
 	}
 	tests := []struct {
 		name    string
@@ -119,7 +122,7 @@ func TestGalaxyInstance_Put(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			g := test_util.NewTestInstance()
-			got, err := g.Put(tt.args.ctx, tt.args.model)
+			got, err := g.Put(tt.args.ctx, tt.args.model, tt.args.params)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("Put() error = %v, wantErr %v", err, tt.wantErr)
 				return
