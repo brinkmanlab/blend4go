@@ -49,7 +49,7 @@ func (h *History) SetID(id blend4go.GalaxyID) {
 }
 
 // Create a new history
-func (h *History) NewHistory(ctx context.Context, g *blend4go.GalaxyInstance, name string) (*History, error) {
+func NewHistory(ctx context.Context, g *blend4go.GalaxyInstance, name string) (*History, error) {
 	// POST /api/histories
 	if res, err := g.R(ctx).SetResult(&History{}).SetBody(map[string]string{"name": name}).Post(BasePath); err == nil {
 		h := res.Result().(*History)
