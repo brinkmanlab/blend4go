@@ -3,12 +3,9 @@ package users_test
 import (
 	"context"
 	"github.com/brinkmanlab/blend4go"
-	"github.com/brinkmanlab/blend4go/test_util"
 	"github.com/brinkmanlab/blend4go/users"
 	"testing"
 )
-
-var galaxyInstance = test_util.NewTestInstance()
 
 func TestNewUser(t *testing.T) {
 	type args struct {
