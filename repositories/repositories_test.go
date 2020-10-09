@@ -1,8 +1,9 @@
-package repositories
+package repositories_test
 
 import (
 	"context"
 	"github.com/brinkmanlab/blend4go"
+	"github.com/brinkmanlab/blend4go/repositories"
 	"reflect"
 	"testing"
 )
@@ -24,7 +25,7 @@ func TestCheckForUpdates(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if err := CheckForUpdates(tt.args.ctx, tt.args.g, tt.args.repoID); (err != nil) != tt.wantErr {
+			if err := repositories.CheckForUpdates(tt.args.ctx, tt.args.g, tt.args.repoID); (err != nil) != tt.wantErr {
 				t.Errorf("CheckForUpdates() error = %v, wantErr %v", err, tt.wantErr)
 			}
 		})
@@ -40,14 +41,14 @@ func TestGet(t *testing.T) {
 	tests := []struct {
 		name    string
 		args    args
-		want    *Repository
+		want    *repositories.Repository
 		wantErr bool
 	}{
 		// TODO: Add test cases.
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, err := Get(tt.args.ctx, tt.args.g, tt.args.id)
+			got, err := repositories.Get(tt.args.ctx, tt.args.g, tt.args.id)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("Get() error = %v, wantErr %v", err, tt.wantErr)
 				return
@@ -76,14 +77,19 @@ func TestInstall(t *testing.T) {
 	tests := []struct {
 		name    string
 		args    args
+		success func([]*repositories.Repository) bool
 		wantErr bool
 	}{
 		// TODO: Add test cases.
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if err := Install(tt.args.ctx, tt.args.g, tt.args.toolShedUrl, tt.args.name, tt.args.owner, tt.args.changesetRevision, tt.args.installToolDependencies, tt.args.installRepositoryDependencies, tt.args.installResolverDependencies, tt.args.toolPanelSectionId, tt.args.newToolPanelSectionLabel); (err != nil) != tt.wantErr {
+			if repos, err := repositories.Install(tt.args.ctx, tt.args.g, tt.args.toolShedUrl, tt.args.owner, tt.args.name, tt.args.changesetRevision, tt.args.installToolDependencies, tt.args.installRepositoryDependencies, tt.args.installResolverDependencies, tt.args.toolPanelSectionId, tt.args.newToolPanelSectionLabel); (err != nil) != tt.wantErr {
 				t.Errorf("Install() error = %v, wantErr %v", err, tt.wantErr)
+			} else {
+				if !tt.success(repos) {
+					t.Errorf("Install() got = %v", repos)
+				}
 			}
 		})
 	}
@@ -97,14 +103,14 @@ func TestList(t *testing.T) {
 	tests := []struct {
 		name    string
 		args    args
-		want    []*Repository
+		want    []*repositories.Repository
 		wantErr bool
 	}{
 		// TODO: Add test cases.
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, err := List(tt.args.ctx, tt.args.g)
+			got, err := repositories.List(tt.args.ctx, tt.args.g)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("List() error = %v, wantErr %v", err, tt.wantErr)
 				return
@@ -130,7 +136,7 @@ func TestResetMetadataAll(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if err := ResetMetadataAll(tt.args.ctx, tt.args.g); (err != nil) != tt.wantErr {
+			if err := repositories.ResetMetadataAll(tt.args.ctx, tt.args.g); (err != nil) != tt.wantErr {
 				t.Errorf("ResetMetadataAll() error = %v, wantErr %v", err, tt.wantErr)
 			}
 		})
@@ -156,7 +162,7 @@ func TestUninstall(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if err := Uninstall(tt.args.ctx, tt.args.g, tt.args.toolShedUrl, tt.args.name, tt.args.owner, tt.args.changesetRevision, tt.args.removeFromDisk); (err != nil) != tt.wantErr {
+			if err := repositories.Uninstall(tt.args.ctx, tt.args.g, tt.args.toolShedUrl, tt.args.owner, tt.args.name, tt.args.changesetRevision, tt.args.removeFromDisk); (err != nil) != tt.wantErr {
 				t.Errorf("Uninstall() error = %v, wantErr %v", err, tt.wantErr)
 			}
 		})
@@ -179,7 +185,7 @@ func TestUninstallID(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if err := UninstallID(tt.args.ctx, tt.args.g, tt.args.id, tt.args.removeFromDisk); (err != nil) != tt.wantErr {
+			if err := repositories.UninstallID(tt.args.ctx, tt.args.g, tt.args.id, tt.args.removeFromDisk); (err != nil) != tt.wantErr {
 				t.Errorf("UninstallID() error = %v, wantErr %v", err, tt.wantErr)
 			}
 		})

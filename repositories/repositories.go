@@ -2,8 +2,10 @@ package repositories
 
 import (
 	"context"
+	"encoding/json"
 	"errors"
 	"github.com/brinkmanlab/blend4go"
+	"strings"
 )
 
 const BasePath = "/api/tool_shed_repositories"
@@ -39,7 +41,7 @@ type repoInstallConfig struct {
 }
 
 // Install a specified repository revision from a specified tool shed into Galaxy
-func Install(ctx context.Context, g *blend4go.GalaxyInstance, toolShedUrl string, name string, owner string, changesetRevision string, installToolDependencies bool, installRepositoryDependencies bool, installResolverDependencies bool, toolPanelSectionId blend4go.GalaxyID, newToolPanelSectionLabel string) error {
+func Install(ctx context.Context, g *blend4go.GalaxyInstance, toolShedUrl string, owner string, name string, changesetRevision string, installToolDependencies bool, installRepositoryDependencies bool, installResolverDependencies bool, toolPanelSectionId blend4go.GalaxyID, newToolPanelSectionLabel string) ([]*Repository, error) {
 	//https://github.com/galaxyproject/ephemeris/blob/474a1c1cd4d5444ece00a3e53eafcb234643db90/src/ephemeris/shed_tools.py#L374
 	// POST /api/tool_shed_repositories/install_repository_revision
 	// https://docs.galaxyproject.org/en/latest/api/api.html#galaxy.webapps.galaxy.api.tool_shed_repositories.ToolShedRepositoriesController.install_repository_revision
@@ -49,18 +51,33 @@ func Install(ctx context.Context, g *blend4go.GalaxyInstance, toolShedUrl string
 	}
 	// TODO changeset_revision == "" ? install latest
 	config := repoInstallConfig{ToolShedUrl: toolShedUrl, Name: name, Owner: owner, ChangesetRevision: changesetRevision, InstallToolDependencies: installToolDependencies, InstallRepositoryDependencies: installRepositoryDependencies, InstallResolverDependencies: installResolverDependencies, ToolPanelSectionId: toolPanelSectionId, NewToolPanelSectionLabel: newToolPanelSectionLabel}
-	if res, err := g.R(ctx).SetBody(config).SetResult(blend4go.StatusResponse{}).Post("/api/tool_shed_repositories/install_repository_revision"); err == nil {
-		if res.Result().(blend4go.StatusResponse).Status == "ok" {
-			return errors.New(res.Result().(blend4go.StatusResponse).Message)
+	if res, err := g.R(ctx).SetBody(config).Post("/api/tool_shed_repositories/install_repository_revision"); err == nil {
+		if strings.HasPrefix(res.String(), "[") {
+			var repos []*Repository
+			if err := json.Unmarshal(res.Body(), repos); err == nil {
+				return repos, nil
+			} else {
+				return nil, err
+			}
+		} else {
+			status := &blend4go.StatusResponse{}
+			if err := json.Unmarshal(res.Body(), status); err == nil {
+				if status.Status == "ok" {
+					return nil, nil
+				} else {
+					return nil, errors.New(status.Message)
+				}
+			} else {
+				return nil, err
+			}
 		}
 	} else {
-		return err
+		return nil, err
 	}
-	return nil
 }
 
 // Uninstall a specified repository revision from a specified tool shed from Galaxy
-func Uninstall(ctx context.Context, g *blend4go.GalaxyInstance, toolShedUrl string, name string, owner string, changesetRevision string, removeFromDisk bool) error {
+func Uninstall(ctx context.Context, g *blend4go.GalaxyInstance, toolShedUrl string, owner string, name string, changesetRevision string, removeFromDisk bool) error {
 	config := repoInstallConfig{ToolShedUrl: toolShedUrl, Name: name, Owner: owner, ChangesetRevision: changesetRevision, RemoveFromDisk: removeFromDisk}
 	if res, err := g.R(ctx).SetBody(config).SetResult(blend4go.StatusResponse{}).Delete("/api/tool_shed_repositories/"); err == nil {
 		if res.Result().(blend4go.StatusResponse).Status == "ok" {
