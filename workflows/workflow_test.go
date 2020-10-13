@@ -1,8 +1,10 @@
-package workflows
+package workflows_test
 
 import (
 	"context"
 	"github.com/brinkmanlab/blend4go"
+	"github.com/brinkmanlab/blend4go/repositories"
+	"github.com/brinkmanlab/blend4go/workflows"
 	"reflect"
 	"testing"
 )
@@ -16,14 +18,14 @@ func TestNewStoredWorkflow(t *testing.T) {
 	tests := []struct {
 		name    string
 		args    args
-		want    *StoredWorkflow
+		want    *workflows.StoredWorkflow
 		wantErr bool
 	}{
 		// TODO: Add test cases.
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, err := NewStoredWorkflow(tt.args.ctx, tt.args.g, tt.args.json)
+			got, err := workflows.NewStoredWorkflow(tt.args.ctx, tt.args.g, tt.args.json)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("NewStoredWorkflow() error = %v, wantErr %v", err, tt.wantErr)
 				return
@@ -49,10 +51,10 @@ func TestStoredWorkflow_Delete(t *testing.T) {
 		Published          bool
 		Owner              string
 		ModelClass         string
-		Inputs             []*StoredWorkflowInput
+		Inputs             []*workflows.StoredWorkflowInput
 		Annotation         string
 		Version            uint
-		Steps              []*WorkflowInvocationStep
+		Steps              []*workflows.WorkflowInvocationStep
 	}
 	type args struct {
 		ctx context.Context
@@ -67,8 +69,7 @@ func TestStoredWorkflow_Delete(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			w := &StoredWorkflow{
-				galaxyInstance:     tt.fields.galaxyInstance,
+			w := &workflows.StoredWorkflow{
 				Id:                 tt.fields.Id,
 				Name:               tt.fields.Name,
 				Tags:               tt.fields.Tags,
@@ -106,10 +107,10 @@ func TestStoredWorkflow_Download(t *testing.T) {
 		Published          bool
 		Owner              string
 		ModelClass         string
-		Inputs             []*StoredWorkflowInput
+		Inputs             []*workflows.StoredWorkflowInput
 		Annotation         string
 		Version            uint
-		Steps              []*WorkflowInvocationStep
+		Steps              []*workflows.WorkflowInvocationStep
 	}
 	type args struct {
 		ctx context.Context
@@ -125,8 +126,7 @@ func TestStoredWorkflow_Download(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			w := &StoredWorkflow{
-				galaxyInstance:     tt.fields.galaxyInstance,
+			w := &workflows.StoredWorkflow{
 				Id:                 tt.fields.Id,
 				Name:               tt.fields.Name,
 				Tags:               tt.fields.Tags,
@@ -169,10 +169,10 @@ func TestStoredWorkflow_GetBasePath(t *testing.T) {
 		Published          bool
 		Owner              string
 		ModelClass         string
-		Inputs             []*StoredWorkflowInput
+		Inputs             []*workflows.StoredWorkflowInput
 		Annotation         string
 		Version            uint
-		Steps              []*WorkflowInvocationStep
+		Steps              []*workflows.WorkflowInvocationStep
 	}
 	tests := []struct {
 		name   string
@@ -183,8 +183,7 @@ func TestStoredWorkflow_GetBasePath(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			w := &StoredWorkflow{
-				galaxyInstance:     tt.fields.galaxyInstance,
+			w := &workflows.StoredWorkflow{
 				Id:                 tt.fields.Id,
 				Name:               tt.fields.Name,
 				Tags:               tt.fields.Tags,
@@ -222,10 +221,10 @@ func TestStoredWorkflow_GetID(t *testing.T) {
 		Published          bool
 		Owner              string
 		ModelClass         string
-		Inputs             []*StoredWorkflowInput
+		Inputs             []*workflows.StoredWorkflowInput
 		Annotation         string
 		Version            uint
-		Steps              []*WorkflowInvocationStep
+		Steps              []*workflows.WorkflowInvocationStep
 	}
 	tests := []struct {
 		name   string
@@ -236,8 +235,7 @@ func TestStoredWorkflow_GetID(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			w := &StoredWorkflow{
-				galaxyInstance:     tt.fields.galaxyInstance,
+			w := &workflows.StoredWorkflow{
 				Id:                 tt.fields.Id,
 				Name:               tt.fields.Name,
 				Tags:               tt.fields.Tags,
@@ -275,10 +273,10 @@ func TestStoredWorkflow_Invoke(t *testing.T) {
 		Published          bool
 		Owner              string
 		ModelClass         string
-		Inputs             []*StoredWorkflowInput
+		Inputs             []*workflows.StoredWorkflowInput
 		Annotation         string
 		Version            uint
-		Steps              []*WorkflowInvocationStep
+		Steps              []*workflows.WorkflowInvocationStep
 	}
 	type args struct {
 		ctx context.Context
@@ -293,8 +291,7 @@ func TestStoredWorkflow_Invoke(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			w := &StoredWorkflow{
-				galaxyInstance:     tt.fields.galaxyInstance,
+			w := &workflows.StoredWorkflow{
 				Id:                 tt.fields.Id,
 				Name:               tt.fields.Name,
 				Tags:               tt.fields.Tags,
@@ -332,10 +329,10 @@ func TestStoredWorkflow_Repositories(t *testing.T) {
 		Published          bool
 		Owner              string
 		ModelClass         string
-		Inputs             []*StoredWorkflowInput
+		Inputs             []*workflows.StoredWorkflowInput
 		Annotation         string
 		Version            uint
-		Steps              []*WorkflowInvocationStep
+		Steps              []*workflows.WorkflowInvocationStep
 	}
 	type args struct {
 		ctx context.Context
@@ -351,8 +348,7 @@ func TestStoredWorkflow_Repositories(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			w := &StoredWorkflow{
-				galaxyInstance:     tt.fields.galaxyInstance,
+			w := &workflows.StoredWorkflow{
 				Id:                 tt.fields.Id,
 				Name:               tt.fields.Name,
 				Tags:               tt.fields.Tags,
@@ -395,10 +391,10 @@ func TestStoredWorkflow_SetGalaxyInstance(t *testing.T) {
 		Published          bool
 		Owner              string
 		ModelClass         string
-		Inputs             []*StoredWorkflowInput
+		Inputs             []*workflows.StoredWorkflowInput
 		Annotation         string
 		Version            uint
-		Steps              []*WorkflowInvocationStep
+		Steps              []*workflows.WorkflowInvocationStep
 	}
 	type args struct {
 		g *blend4go.GalaxyInstance
@@ -412,8 +408,7 @@ func TestStoredWorkflow_SetGalaxyInstance(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			w := &StoredWorkflow{
-				galaxyInstance:     tt.fields.galaxyInstance,
+			w := &workflows.StoredWorkflow{
 				Id:                 tt.fields.Id,
 				Name:               tt.fields.Name,
 				Tags:               tt.fields.Tags,
@@ -448,10 +443,10 @@ func TestStoredWorkflow_SetID(t *testing.T) {
 		Published          bool
 		Owner              string
 		ModelClass         string
-		Inputs             []*StoredWorkflowInput
+		Inputs             []*workflows.StoredWorkflowInput
 		Annotation         string
 		Version            uint
-		Steps              []*WorkflowInvocationStep
+		Steps              []*workflows.WorkflowInvocationStep
 	}
 	type args struct {
 		id blend4go.GalaxyID
@@ -465,8 +460,7 @@ func TestStoredWorkflow_SetID(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			w := &StoredWorkflow{
-				galaxyInstance:     tt.fields.galaxyInstance,
+			w := &workflows.StoredWorkflow{
 				Id:                 tt.fields.Id,
 				Name:               tt.fields.Name,
 				Tags:               tt.fields.Tags,
@@ -501,10 +495,10 @@ func TestStoredWorkflow_Update(t *testing.T) {
 		Published          bool
 		Owner              string
 		ModelClass         string
-		Inputs             []*StoredWorkflowInput
+		Inputs             []*workflows.StoredWorkflowInput
 		Annotation         string
 		Version            uint
-		Steps              []*WorkflowInvocationStep
+		Steps              []*workflows.WorkflowInvocationStep
 	}
 	type args struct {
 		ctx  context.Context
@@ -520,8 +514,7 @@ func TestStoredWorkflow_Update(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			w := &StoredWorkflow{
-				galaxyInstance:     tt.fields.galaxyInstance,
+			w := &workflows.StoredWorkflow{
 				Id:                 tt.fields.Id,
 				Name:               tt.fields.Name,
 				Tags:               tt.fields.Tags,
