@@ -21,12 +21,14 @@ type StatusResponse struct {
 }
 
 type ErrorResponse struct {
-	Message string `json:"err_msg"`
-	Code    int    `json:"err_code"`
+	Message1 string `json:"message"`
+	Code1    int    `json:"code"`
+	Message  string `json:"err_msg"`
+	Code     int    `json:"err_code"`
 }
 
 func (e *ErrorResponse) String() string {
-	return fmt.Sprintf("%v: %v", e.Code, e.Message)
+	return fmt.Sprintf("%v%v: %v%v", e.Code, e.Code1, e.Message, e.Message1)
 }
 
 type GalaxyInstance struct {
