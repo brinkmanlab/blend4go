@@ -67,7 +67,11 @@ func NewStoredWorkflow(ctx context.Context, g *blend4go.GalaxyInstance, json str
 	if res, err := g.R(ctx).SetResult(&StoredWorkflow{galaxyInstance: g}).SetBody(map[string]string{
 		"workflow": json,
 	}).Post(BasePath); err == nil {
-		return res.Result().(*StoredWorkflow), nil
+		if result, err := blend4go.HandleResponse(res); err == nil {
+			return result.(*StoredWorkflow), nil
+		} else {
+			return nil, err
+		}
 	} else {
 		return nil, err
 	}
@@ -99,14 +103,29 @@ func (w *StoredWorkflow) Update(ctx context.Context, json string) error {
 	body["name"] = w.Name
 	body["annotation"] = w.Annotation
 
-	_, err := w.galaxyInstance.R(ctx).SetResult(w).SetBody(body).Put(path.Join(w.GetBasePath(), w.GetID()))
-	return err
+	if res, err := w.galaxyInstance.R(ctx).SetResult(w).SetBody(body).Put(path.Join(w.GetBasePath(), w.GetID())); err == nil {
+		if _, err := blend4go.HandleResponse(res); err == nil {
+			return nil
+		} else {
+			return err
+		}
+	} else {
+		return err
+	}
 }
 
 func (w *StoredWorkflow) Download(ctx context.Context) (string, error) {
 	// GET /api/workflows/{encoded_workflow_id}/download
-	res, err := w.galaxyInstance.R(ctx).Get(path.Join(w.GetBasePath(), w.GetID(), "download"))
-	return res.String(), err
+	if res, err := w.galaxyInstance.R(ctx).Get(path.Join(w.GetBasePath(), w.GetID(), "download")); err == nil {
+		if _, err := blend4go.HandleResponse(res); err == nil {
+			return string(res.Body()), nil
+		} else {
+			return "", err
+		}
+	} else {
+		return "", err
+	}
+
 }
 
 func (w *StoredWorkflow) Repositories(ctx context.Context) ([]*repositories.Repository, error) {

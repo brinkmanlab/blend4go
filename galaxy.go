@@ -2,6 +2,8 @@ package blend4go
 
 import (
 	"context"
+	"errors"
+	"fmt"
 	"github.com/go-resty/resty/v2"
 	"path"
 	"runtime/debug"
@@ -16,6 +18,15 @@ type GalaxyRequest = *resty.Request
 type StatusResponse struct {
 	Status  string
 	Message string
+}
+
+type ErrorResponse struct {
+	Message string `json:"err_msg"`
+	Code    string `json:"err_code"`
+}
+
+func (e *ErrorResponse) String() string {
+	return fmt.Sprintf("%v: %v", e.Code, e.Message)
 }
 
 type GalaxyInstance struct {
@@ -42,6 +53,16 @@ func GetAPIKey(ctx context.Context, host, username, password string) (string, er
 	}
 }
 
+func HandleResponse(response *resty.Response) (interface{}, error) {
+	if response.IsError() {
+		return nil, errors.New(response.Error().(*ErrorResponse).String())
+	}
+	if response.IsSuccess() {
+		return response.Result(), nil
+	}
+	return nil, fmt.Errorf("unhandled response: %v", response.Status())
+}
+
 func NewGalaxyInstance(host, apiKey string) (g *GalaxyInstance) {
 	agent := "blend4go"
 	if info, ok := debug.ReadBuildInfo(); ok {
@@ -62,13 +83,16 @@ func (g *GalaxyInstance) List(ctx context.Context, path string, models interface
 		r.SetQueryParams(*params)
 	}
 	if res, err := r.SetResult(models).Get(path); err == nil {
-		results := res.Result()
-		if r, ok := results.([]GalaxyModel); ok {
-			for _, m := range r {
-				m.SetGalaxyInstance(g)
+		if results, err := HandleResponse(res); err == nil {
+			if r, ok := results.([]GalaxyModel); ok {
+				for _, m := range r {
+					m.SetGalaxyInstance(g)
+				}
 			}
+			return results, err
+		} else {
+			return nil, err
 		}
-		return results, err
 	} else {
 		return nil, err
 	}
@@ -80,9 +104,13 @@ func (g *GalaxyInstance) Get(ctx context.Context, id GalaxyID, model GalaxyModel
 		r.SetQueryParams(*params)
 	}
 	if res, err := r.SetResult(model).Get(path.Join(model.GetBasePath(), id)); err == nil {
-		m := res.Result().(GalaxyModel)
-		m.SetGalaxyInstance(g)
-		return m, nil
+		if result, err := HandleResponse(res); err == nil {
+			m := result.(GalaxyModel)
+			m.SetGalaxyInstance(g)
+			return m, nil
+		} else {
+			return nil, err
+		}
 	} else {
 		return nil, err
 	}
@@ -94,7 +122,13 @@ func (g *GalaxyInstance) Put(ctx context.Context, model GalaxyModel, params *map
 		r.SetQueryParams(*params)
 	}
 	if res, err := r.SetResult(model).SetBody(model).Put(path.Join(model.GetBasePath(), model.GetID())); err == nil {
-		return res.Result().(GalaxyModel), nil
+		if result, err := HandleResponse(res); err == nil {
+			m := result.(GalaxyModel)
+			m.SetGalaxyInstance(g)
+			return m, nil
+		} else {
+			return nil, err
+		}
 	} else {
 		return nil, err
 	}
@@ -105,15 +139,16 @@ func (g *GalaxyInstance) Delete(ctx context.Context, model GalaxyModel, params *
 	if params != nil {
 		r.SetQueryParams(*params)
 	}
-	if _, err := r.Delete(path.Join(model.GetBasePath(), model.GetID())); err == nil {
-		return err // TODO handle result. Status message?
+	if res, err := r.Delete(path.Join(model.GetBasePath(), model.GetID())); err == nil {
+		_, err := HandleResponse(res)
+		return err
 	} else {
 		return err
 	}
 }
 
 func (g *GalaxyInstance) R(ctx context.Context) GalaxyRequest {
-	return g.Client.R().SetContext(ctx)
+	return g.Client.R().SetContext(ctx).SetError(&ErrorResponse{})
 }
 
 type ToolShed struct {

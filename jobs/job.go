@@ -49,8 +49,13 @@ type invocationResponse struct {
 func NewJob(ctx context.Context, g *blend4go.GalaxyInstance, payload map[string]interface{}) ([]*Job, []*histories.HistoryDatasetAssociation, []*histories.HistoryDatasetCollectionAssociation, []*histories.HistoryDatasetCollectionAssociation, error) {
 	//POST /api/tools
 	if res, err := g.R(ctx).SetBody(payload).SetResult(&invocationResponse{}).Post("/api/tools"); err == nil {
-		r := res.Result().(invocationResponse)
-		return r.Jobs, r.Outputs, r.OutputCollections, r.ImplicitCollections, err
+		if result, err := blend4go.HandleResponse(res); err == nil {
+			r := result.(invocationResponse)
+			return r.Jobs, r.Outputs, r.OutputCollections, r.ImplicitCollections, err
+		} else {
+			return nil, nil, nil, nil, err
+		}
+
 	} else {
 		return nil, nil, nil, nil, err
 	}
@@ -65,8 +70,15 @@ func (j *Job) Delete(ctx context.Context) error {
 // Resume paused job
 func (j *Job) Resume(ctx context.Context) error {
 	//PUT /api/jobs/{id}/resume
-	_, err := j.galaxyInstance.R(ctx).Put(path.Join(j.GetBasePath(), j.GetID(), "resume"))
-	return err
+	if res, err := j.galaxyInstance.R(ctx).Put(path.Join(j.GetBasePath(), j.GetID(), "resume")); err == nil {
+		if _, err := blend4go.HandleResponse(res); err == nil {
+			return nil
+		} else {
+			return err
+		}
+	} else {
+		return err
+	}
 }
 
 //GET /api/jobs/{id}/common_problems

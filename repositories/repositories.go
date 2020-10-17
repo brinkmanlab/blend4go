@@ -52,24 +52,28 @@ func Install(ctx context.Context, g *blend4go.GalaxyInstance, toolShedUrl string
 	// TODO changeset_revision == "" ? install latest
 	config := repoInstallConfig{ToolShedUrl: toolShedUrl, Name: name, Owner: owner, ChangesetRevision: changesetRevision, InstallToolDependencies: installToolDependencies, InstallRepositoryDependencies: installRepositoryDependencies, InstallResolverDependencies: installResolverDependencies, ToolPanelSectionId: toolPanelSectionId, NewToolPanelSectionLabel: newToolPanelSectionLabel}
 	if res, err := g.R(ctx).SetBody(config).Post("/api/tool_shed_repositories/install_repository_revision"); err == nil {
-		if strings.HasPrefix(res.String(), "[") {
-			var repos []*Repository
-			if err := json.Unmarshal(res.Body(), repos); err == nil {
-				return repos, nil
-			} else {
-				return nil, err
-			}
-		} else {
-			status := &blend4go.StatusResponse{}
-			if err := json.Unmarshal(res.Body(), status); err == nil {
-				if status.Status == "ok" {
-					return nil, nil
+		if _, err := blend4go.HandleResponse(res); err == nil {
+			if strings.HasPrefix(res.String(), "[") {
+				repos := make([]*Repository, 0)
+				if err := json.Unmarshal(res.Body(), &repos); err == nil {
+					return repos, nil
 				} else {
-					return nil, errors.New(status.Message)
+					return nil, err
 				}
 			} else {
-				return nil, err
+				status := &blend4go.StatusResponse{}
+				if err := json.Unmarshal(res.Body(), status); err == nil {
+					if status.Status == "ok" {
+						return nil, nil
+					} else {
+						return nil, errors.New(status.Message)
+					}
+				} else {
+					return nil, err
+				}
 			}
+		} else {
+			return nil, err
 		}
 	} else {
 		return nil, err
@@ -80,26 +84,34 @@ func Install(ctx context.Context, g *blend4go.GalaxyInstance, toolShedUrl string
 func Uninstall(ctx context.Context, g *blend4go.GalaxyInstance, toolShedUrl string, owner string, name string, changesetRevision string, removeFromDisk bool) error {
 	config := repoInstallConfig{ToolShedUrl: toolShedUrl, Name: name, Owner: owner, ChangesetRevision: changesetRevision, RemoveFromDisk: removeFromDisk}
 	if res, err := g.R(ctx).SetBody(config).SetResult(blend4go.StatusResponse{}).Delete("/api/tool_shed_repositories/"); err == nil {
-		if res.Result().(blend4go.StatusResponse).Status == "ok" {
-			return errors.New(res.Result().(blend4go.StatusResponse).Message)
+		if result, err := blend4go.HandleResponse(res); err == nil {
+			if result.(blend4go.StatusResponse).Status == "ok" {
+				return errors.New(res.Result().(blend4go.StatusResponse).Message)
+			}
+			return nil
+		} else {
+			return err
 		}
 	} else {
 		return err
 	}
-	return nil
 }
 
 // Uninstall a specified repository id
 func UninstallID(ctx context.Context, g *blend4go.GalaxyInstance, id string, removeFromDisk bool) error {
 	config := repoInstallConfig{Id: id, RemoveFromDisk: removeFromDisk}
 	if res, err := g.R(ctx).SetBody(config).SetResult(blend4go.StatusResponse{}).Delete("/api/tool_shed_repositories/"); err == nil {
-		if res.Result().(blend4go.StatusResponse).Status == "ok" {
-			return errors.New(res.Result().(blend4go.StatusResponse).Message)
+		if result, err := blend4go.HandleResponse(res); err == nil {
+			if result.(blend4go.StatusResponse).Status == "ok" {
+				return errors.New(res.Result().(blend4go.StatusResponse).Message)
+			}
+			return nil
+		} else {
+			return err
 		}
 	} else {
 		return err
 	}
-	return nil
 }
 
 // Check for updates to the specified repository, or all installed repositories.
@@ -109,10 +121,14 @@ func CheckForUpdates(ctx context.Context, g *blend4go.GalaxyInstance, repoID ble
 		req.SetQueryParam("id", repoID)
 	}
 	if res, err := req.SetResult(blend4go.StatusResponse{}).Get("/api/tool_shed_repositories/check_for_updates"); err == nil {
-		if res.Result().(blend4go.StatusResponse).Status != "ok" {
-			return errors.New(res.Result().(blend4go.StatusResponse).Message)
+		if result, err := blend4go.HandleResponse(res); err == nil {
+			if result.(blend4go.StatusResponse).Status != "ok" {
+				return errors.New(res.Result().(blend4go.StatusResponse).Message)
+			}
+			return nil
+		} else {
+			return err
 		}
-		return nil
 	} else {
 		return err
 	}
@@ -120,10 +136,14 @@ func CheckForUpdates(ctx context.Context, g *blend4go.GalaxyInstance, repoID ble
 
 func ResetMetadataAll(ctx context.Context, g *blend4go.GalaxyInstance) error {
 	if res, err := g.R(ctx).SetResult(blend4go.StatusResponse{}).Get("/api/tool_shed_repositories/check_for_updates"); err == nil {
-		if res.Result().(blend4go.StatusResponse).Status != "ok" {
-			return errors.New(res.Result().(blend4go.StatusResponse).Message)
+		if result, err := blend4go.HandleResponse(res); err == nil {
+			if result.(blend4go.StatusResponse).Status != "ok" {
+				return errors.New(res.Result().(blend4go.StatusResponse).Message)
+			}
+			return nil
+		} else {
+			return err
 		}
-		return nil
 	} else {
 		return err
 	}

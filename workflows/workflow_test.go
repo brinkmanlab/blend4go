@@ -378,75 +378,12 @@ func TestStoredWorkflow_Repositories(t *testing.T) {
 }
 
 func TestStoredWorkflow_SetGalaxyInstance(t *testing.T) {
-	type fields struct {
-		galaxyInstance     *blend4go.GalaxyInstance
-		Id                 blend4go.GalaxyID
-		Name               string
-		Tags               []string
-		Deleted            bool
-		LatestWorkflowUuid string
-		ShowInToolPanel    bool
-		Url                string
-		NumberOfSteps      uint
-		Published          bool
-		Owner              string
-		ModelClass         string
-		Inputs             []*workflows.StoredWorkflowInput
-		Annotation         string
-		Version            uint
-		Steps              []*workflows.WorkflowInvocationStep
-	}
-	type args struct {
-		g *blend4go.GalaxyInstance
-	}
-	tests := []struct {
-		name   string
-		fields fields
-		args   args
-	}{
-		// TODO: Add test cases.
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			w := &workflows.StoredWorkflow{
-				Id:                 tt.fields.Id,
-				Name:               tt.fields.Name,
-				Tags:               tt.fields.Tags,
-				Deleted:            tt.fields.Deleted,
-				LatestWorkflowUuid: tt.fields.LatestWorkflowUuid,
-				ShowInToolPanel:    tt.fields.ShowInToolPanel,
-				Url:                tt.fields.Url,
-				NumberOfSteps:      tt.fields.NumberOfSteps,
-				Published:          tt.fields.Published,
-				Owner:              tt.fields.Owner,
-				ModelClass:         tt.fields.ModelClass,
-				Inputs:             tt.fields.Inputs,
-				Annotation:         tt.fields.Annotation,
-				Version:            tt.fields.Version,
-				Steps:              tt.fields.Steps,
-			}
-		})
-	}
+	t.SkipNow()
 }
 
 func TestStoredWorkflow_SetID(t *testing.T) {
 	type fields struct {
-		galaxyInstance     *blend4go.GalaxyInstance
-		Id                 blend4go.GalaxyID
-		Name               string
-		Tags               []string
-		Deleted            bool
-		LatestWorkflowUuid string
-		ShowInToolPanel    bool
-		Url                string
-		NumberOfSteps      uint
-		Published          bool
-		Owner              string
-		ModelClass         string
-		Inputs             []*workflows.StoredWorkflowInput
-		Annotation         string
-		Version            uint
-		Steps              []*workflows.WorkflowInvocationStep
+		Id blend4go.GalaxyID
 	}
 	type args struct {
 		id blend4go.GalaxyID
@@ -455,27 +392,23 @@ func TestStoredWorkflow_SetID(t *testing.T) {
 		name   string
 		fields fields
 		args   args
+		want   blend4go.GalaxyID
 	}{
-		// TODO: Add test cases.
+		{
+			name:   "Basic",
+			fields: fields{Id: "oldid"},
+			args:   args{id: "test"},
+			want:   "test",
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			w := &workflows.StoredWorkflow{
-				Id:                 tt.fields.Id,
-				Name:               tt.fields.Name,
-				Tags:               tt.fields.Tags,
-				Deleted:            tt.fields.Deleted,
-				LatestWorkflowUuid: tt.fields.LatestWorkflowUuid,
-				ShowInToolPanel:    tt.fields.ShowInToolPanel,
-				Url:                tt.fields.Url,
-				NumberOfSteps:      tt.fields.NumberOfSteps,
-				Published:          tt.fields.Published,
-				Owner:              tt.fields.Owner,
-				ModelClass:         tt.fields.ModelClass,
-				Inputs:             tt.fields.Inputs,
-				Annotation:         tt.fields.Annotation,
-				Version:            tt.fields.Version,
-				Steps:              tt.fields.Steps,
+			u := &workflows.StoredWorkflow{
+				Id: tt.fields.Id,
+			}
+			u.SetID(tt.args.id)
+			if u.Id != tt.want {
+				t.Errorf("SetID() = %v, wanted %v", u.Id, tt.want)
 			}
 		})
 	}

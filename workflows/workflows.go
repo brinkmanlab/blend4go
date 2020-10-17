@@ -46,13 +46,13 @@ func Get(ctx context.Context, g *blend4go.GalaxyInstance, id blend4go.GalaxyID) 
 }
 
 // Recursively search for all tool ids in workflow
-func findToolIDs(data interface{}) ([]*repositories.Repository, error) {
+func findToolIDs(data map[string]interface{}) ([]*repositories.Repository, error) {
 	var res []*repositories.Repository
 
 	// Search subworkflows
 	// This can be replaced by a recursive query when added to JMESPath https://github.com/jmespath/jmespath.py/issues/110
 	if subworkflows, err := jmespath.Search("steps.*.subworkflow", data); err == nil {
-		for subworkflow := range subworkflows.([]interface{}) {
+		for _, subworkflow := range subworkflows.([]map[string]interface{}) {
 			if ids, err := findToolIDs(subworkflow); err == nil {
 				res = append(res, ids...)
 			} else {
@@ -81,9 +81,9 @@ func findToolIDs(data interface{}) ([]*repositories.Repository, error) {
 }
 
 func Repositories(workflow string) ([]*repositories.Repository, error) {
-	var data interface{}
+	data := make(map[string]interface{})
 
-	if err := json.Unmarshal([]byte(workflow), data); err != nil {
+	if err := json.Unmarshal([]byte(workflow), &data); err != nil {
 		return nil, err
 	}
 

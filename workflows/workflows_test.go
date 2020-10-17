@@ -3,6 +3,7 @@ package workflows
 import (
 	"context"
 	"github.com/brinkmanlab/blend4go"
+	"github.com/brinkmanlab/blend4go/repositories"
 	"reflect"
 	"testing"
 )

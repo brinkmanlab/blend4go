@@ -52,9 +52,13 @@ func (h *History) SetID(id blend4go.GalaxyID) {
 func NewHistory(ctx context.Context, g *blend4go.GalaxyInstance, name string) (*History, error) {
 	// POST /api/histories
 	if res, err := g.R(ctx).SetResult(&History{}).SetBody(map[string]string{"name": name}).Post(BasePath); err == nil {
-		h := res.Result().(*History)
-		h.SetGalaxyInstance(g)
-		return h, err
+		if result, err := blend4go.HandleResponse(res); err == nil {
+			m := result.(*History)
+			m.SetGalaxyInstance(g)
+			return m, nil
+		} else {
+			return nil, err
+		}
 	} else {
 		return nil, err
 	}
@@ -75,8 +79,15 @@ func (h *History) Delete(ctx context.Context, purge bool) error {
 // Undelete history (that hasn’t been purged) with the given id
 func (h *History) Undelete(ctx context.Context) error {
 	// POST /api/histories/deleted/{id}/undelete
-	_, err := h.galaxyInstance.R(ctx).Post(path.Join(h.GetBasePath(), "deleted", h.GetID(), "undelete"))
-	return err
+	if res, err := h.galaxyInstance.R(ctx).Post(path.Join(h.GetBasePath(), "deleted", h.GetID(), "undelete")); err == nil {
+		if _, err := blend4go.HandleResponse(res); err == nil {
+			return nil
+		} else {
+			return err
+		}
+	} else {
+		return err
+	}
 }
 
 // Update the values for the history

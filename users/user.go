@@ -45,7 +45,11 @@ func NewUser(ctx context.Context, g *blend4go.GalaxyInstance, username, password
 		"password": password,
 		"email":    email,
 	}).Post(BasePath); err == nil {
-		return res.Result().(*User), nil
+		if result, err := blend4go.HandleResponse(res); err == nil {
+			return result.(*User), nil
+		} else {
+			return nil, err
+		}
 	} else {
 		return nil, err
 	}
