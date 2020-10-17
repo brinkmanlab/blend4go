@@ -22,7 +22,7 @@ type StatusResponse struct {
 
 type ErrorResponse struct {
 	Message string `json:"err_msg"`
-	Code    string `json:"err_code"`
+	Code    int    `json:"err_code"`
 }
 
 func (e *ErrorResponse) String() string {
@@ -70,7 +70,7 @@ func NewGalaxyInstance(host, apiKey string) (g *GalaxyInstance) {
 	}
 	r := resty.New()
 	r.SetHostURL(host)
-	r.SetHeader("X-AUTH-KEY", apiKey)
+	r.SetHeader("X-API-KEY", apiKey)
 	r.SetHeader("Accept", "application/json")
 	r.SetHeader("Content-Type", "application/json")
 	r.SetHeader("User-Agent", agent)
