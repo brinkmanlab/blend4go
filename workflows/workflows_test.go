@@ -92,29 +92,3 @@ func TestRepositories(t *testing.T) {
 		})
 	}
 }
-
-func Test_findToolIDs(t *testing.T) {
-	type args struct {
-		data interface{}
-	}
-	tests := []struct {
-		name    string
-		args    args
-		want    []*repositories.Repository
-		wantErr bool
-	}{
-		// TODO: Add test cases.
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			got, err := findToolIDs(tt.args.data)
-			if (err != nil) != tt.wantErr {
-				t.Errorf("findToolIDs() error = %v, wantErr %v", err, tt.wantErr)
-				return
-			}
-			if !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("findToolIDs() got = %v, want %v", got, tt.want)
-			}
-		})
-	}
-}

@@ -52,10 +52,10 @@ func TestStoredWorkflow_Delete(t *testing.T) {
 		Published          bool
 		Owner              string
 		ModelClass         string
-		Inputs             []*workflows.StoredWorkflowInput
+		Inputs             map[string]*workflows.StoredWorkflowInput
 		Annotation         string
 		Version            uint
-		Steps              []*workflows.WorkflowInvocationStep
+		Steps              map[string]*workflows.StoredWorkflowStep
 	}
 	type args struct {
 		ctx context.Context
@@ -108,10 +108,10 @@ func TestStoredWorkflow_Download(t *testing.T) {
 		Published          bool
 		Owner              string
 		ModelClass         string
-		Inputs             []*workflows.StoredWorkflowInput
+		Inputs             map[string]*workflows.StoredWorkflowInput
 		Annotation         string
 		Version            uint
-		Steps              []*workflows.WorkflowInvocationStep
+		Steps              map[string]*workflows.StoredWorkflowStep
 	}
 	type args struct {
 		ctx context.Context
@@ -170,10 +170,10 @@ func TestStoredWorkflow_GetBasePath(t *testing.T) {
 		Published          bool
 		Owner              string
 		ModelClass         string
-		Inputs             []*workflows.StoredWorkflowInput
+		Inputs             map[string]*workflows.StoredWorkflowInput
 		Annotation         string
 		Version            uint
-		Steps              []*workflows.WorkflowInvocationStep
+		Steps              map[string]*workflows.StoredWorkflowStep
 	}
 	tests := []struct {
 		name   string
@@ -222,10 +222,10 @@ func TestStoredWorkflow_GetID(t *testing.T) {
 		Published          bool
 		Owner              string
 		ModelClass         string
-		Inputs             []*workflows.StoredWorkflowInput
+		Inputs             map[string]*workflows.StoredWorkflowInput
 		Annotation         string
 		Version            uint
-		Steps              []*workflows.WorkflowInvocationStep
+		Steps              map[string]*workflows.StoredWorkflowStep
 	}
 	tests := []struct {
 		name   string
@@ -274,10 +274,10 @@ func TestStoredWorkflow_Invoke(t *testing.T) {
 		Published          bool
 		Owner              string
 		ModelClass         string
-		Inputs             []*workflows.StoredWorkflowInput
+		Inputs             map[string]*workflows.StoredWorkflowInput
 		Annotation         string
 		Version            uint
-		Steps              []*workflows.WorkflowInvocationStep
+		Steps              map[string]*workflows.StoredWorkflowStep
 	}
 	type args struct {
 		ctx context.Context
@@ -330,10 +330,10 @@ func TestStoredWorkflow_Repositories(t *testing.T) {
 		Published          bool
 		Owner              string
 		ModelClass         string
-		Inputs             []*workflows.StoredWorkflowInput
+		Inputs             map[string]*workflows.StoredWorkflowInput
 		Annotation         string
 		Version            uint
-		Steps              []*workflows.WorkflowInvocationStep
+		Steps              map[string]*workflows.StoredWorkflowStep
 	}
 	type args struct {
 		ctx context.Context
@@ -429,10 +429,10 @@ func TestStoredWorkflow_Update(t *testing.T) {
 		Published          bool
 		Owner              string
 		ModelClass         string
-		Inputs             []*workflows.StoredWorkflowInput
+		Inputs             map[string]*workflows.StoredWorkflowInput
 		Annotation         string
 		Version            uint
-		Steps              []*workflows.WorkflowInvocationStep
+		Steps              map[string]*workflows.StoredWorkflowStep
 	}
 	type args struct {
 		ctx  context.Context
