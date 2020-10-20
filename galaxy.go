@@ -6,7 +6,9 @@ import (
 	"fmt"
 	"github.com/go-resty/resty/v2"
 	"path"
+	"runtime"
 	"runtime/debug"
+	"strings"
 )
 
 // https://blog.golang.org/publishing-go-modules
@@ -16,13 +18,13 @@ type GalaxyID = string
 type GalaxyRequest = *resty.Request
 
 type StatusResponse struct {
-	Status  string
-	Message string
+	Status  string `json:"status"`
+	Message string `json:"message"`
 }
 
 type ErrorResponse struct {
 	Message1 string `json:"message"`
-	Code1    int    `json:"code"`
+	Code1    string `json:"code"`
 	Message  string `json:"err_msg"`
 	Code     int    `json:"err_code"`
 }
@@ -57,7 +59,11 @@ func GetAPIKey(ctx context.Context, host, username, password string) (string, er
 
 func HandleResponse(response *resty.Response) (interface{}, error) {
 	if response.IsError() {
-		return nil, errors.New(response.Error().(*ErrorResponse).String())
+		err := response.Error().(*ErrorResponse)
+		if err.Message == "" && err.Message1 == "" {
+			return nil, errors.New(string(response.Body()))
+		}
+		return nil, errors.New(err.String())
 	}
 	if response.IsSuccess() {
 		return response.Result(), nil

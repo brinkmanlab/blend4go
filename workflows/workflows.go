@@ -41,8 +41,11 @@ func List(ctx context.Context, g *blend4go.GalaxyInstance, published, hidden, de
 func Get(ctx context.Context, g *blend4go.GalaxyInstance, id blend4go.GalaxyID) (*StoredWorkflow, error) {
 	// TODO instance (boolean) – true if fetch by Workflow ID instead of StoredWorkflow id, false by default.
 	// GET /api/workflows/{encoded_workflow_id}
-	res, err := g.Get(ctx, id, &StoredWorkflow{}, nil)
-	return res.(*StoredWorkflow), err
+	if res, err := g.Get(ctx, id, &StoredWorkflow{}, nil); err == nil {
+		return res.(*StoredWorkflow), err
+	} else {
+		return nil, err
+	}
 }
 
 // Recursively search for all tool ids in workflow

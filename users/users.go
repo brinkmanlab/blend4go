@@ -39,6 +39,9 @@ func Get(ctx context.Context, g *blend4go.GalaxyInstance, id blend4go.GalaxyID) 
 	if id == "" {
 		id = "current"
 	}
-	res, err := g.Get(ctx, id, &User{}, nil)
-	return res.(*User), err
+	if res, err := g.Get(ctx, id, &User{}, nil); err == nil {
+		return res.(*User), err
+	} else {
+		return nil, err
+	}
 }
