@@ -57,6 +57,7 @@ func GetAPIKey(ctx context.Context, host, username, password string) (string, er
 	}
 }
 
+// Handle responses from Galaxy API, checking for errors
 func HandleResponse(response *resty.Response) (interface{}, error) {
 	if response.IsError() {
 		err := response.Error().(*ErrorResponse)
@@ -71,6 +72,7 @@ func HandleResponse(response *resty.Response) (interface{}, error) {
 	return nil, fmt.Errorf("unhandled response: %v", response.Status())
 }
 
+// Create a new connection handle to an instance of Galaxy
 func NewGalaxyInstance(host, apiKey string) (g *GalaxyInstance) {
 	// Automatically attach caller package name to agent
 	pc, _, _, _ := runtime.Caller(1)
@@ -91,6 +93,8 @@ func NewGalaxyInstance(host, apiKey string) (g *GalaxyInstance) {
 	return &GalaxyInstance{Client: r}
 }
 
+// Helper to make generic requests against Galaxy API that return lists of objects
+// params is a map of query parameters to add to the request
 func (g *GalaxyInstance) List(ctx context.Context, path string, models interface{}, params *map[string]string) (interface{}, error) {
 	r := g.R(ctx)
 	if params != nil {
@@ -112,6 +116,8 @@ func (g *GalaxyInstance) List(ctx context.Context, path string, models interface
 	}
 }
 
+// Helper to make generic requests against Galaxy API that returns single object
+// params is a map of query parameters to add to the request
 func (g *GalaxyInstance) Get(ctx context.Context, id GalaxyID, model GalaxyModel, params *map[string]string) (GalaxyModel, error) {
 	r := g.R(ctx)
 	if params != nil {
@@ -130,6 +136,8 @@ func (g *GalaxyInstance) Get(ctx context.Context, id GalaxyID, model GalaxyModel
 	}
 }
 
+// Helper to make generic PUT requests to Galaxy API to update objects
+// params is a map of query parameters to add to the request
 func (g *GalaxyInstance) Put(ctx context.Context, model GalaxyModel, params *map[string]string) (GalaxyModel, error) {
 	r := g.R(ctx)
 	if params != nil {
@@ -148,6 +156,8 @@ func (g *GalaxyInstance) Put(ctx context.Context, model GalaxyModel, params *map
 	}
 }
 
+// Helper to make generic DELETE requests to delete single objects
+// params is a map of query parameters to add to the request
 func (g *GalaxyInstance) Delete(ctx context.Context, model GalaxyModel, params *map[string]string) error {
 	r := g.R(ctx)
 	if params != nil {
@@ -161,6 +171,8 @@ func (g *GalaxyInstance) Delete(ctx context.Context, model GalaxyModel, params *
 	}
 }
 
+// Helper to create a new request to the Galaxy API
+// Use this if one of the other functions in this package are not appropriate for the request
 func (g *GalaxyInstance) R(ctx context.Context) GalaxyRequest {
 	return g.Client.R().SetContext(ctx).SetError(&ErrorResponse{})
 }
@@ -170,6 +182,7 @@ type ToolShed struct {
 	Url  string `json:"url"`
 }
 
+// Get a list of toolsheds configured in the galaxy instance
 func (g *GalaxyInstance) ToolSheds(ctx context.Context) ([]*ToolShed, error) {
 	//GET /api/tool_shed Interact with the Toolshed registry of this instance.
 	if res, err := g.R(ctx).SetResult([]*ToolShed{}).Get("/api/tool_shed"); err == nil {
