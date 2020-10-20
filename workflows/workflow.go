@@ -8,21 +8,21 @@ import (
 )
 
 type StoredWorkflowInput struct {
-	Uuid  string `json:"uuid"`
-	Value string `json:"value"`
-	Label string `json:"label"`
+	Uuid  string `json:"uuid,omitempty"`
+	Value string `json:"value,omitempty"`
+	Label string `json:"label,omitempty"`
 }
 
 type StoredWorkflowInputStep struct {
-	StepOutput string `json:"step_output"`
-	SourceStep uint   `json:"source_step"`
+	StepOutput string `json:"step_output,omitempty"`
+	SourceStep uint   `json:"source_step,omitempty"`
 }
 
 type StoredWorkflowStep struct {
-	ToolId      string                     `json:"tool_id,omitempty"`
-	ToolVersion string                     `json:"tool_version,omitempty"`
-	Id          uint                       `json:"id,omitempty"`
-	InputSteps  []*StoredWorkflowInputStep `json:"input_steps,omitempty"`
+	ToolId      string                              `json:"tool_id,omitempty"`
+	ToolVersion string                              `json:"tool_version,omitempty"`
+	Id          uint                                `json:"id,omitempty"`
+	InputSteps  map[string]*StoredWorkflowInputStep `json:"input_steps,omitempty"`
 	// ToolInputs	? `json:"tool_inputs,omitempty"` TODO?
 	Type       string `json:"type,omitempty"`
 	Annotation string `json:"annotation,omitempty"`
@@ -30,21 +30,21 @@ type StoredWorkflowStep struct {
 
 type StoredWorkflow struct {
 	galaxyInstance     *blend4go.GalaxyInstance
-	Id                 blend4go.GalaxyID         `json:"id,omitempty"`
-	Name               string                    `json:"name,omitempty"`
-	Tags               []string                  `json:"tags,omitempty"`
-	Deleted            bool                      `json:"deleted,omitempty"`
-	LatestWorkflowUuid string                    `json:"latest_workflow_uuid,omitempty"`
-	ShowInToolPanel    bool                      `json:"show_in_tool_panel,omitempty"`
-	Url                string                    `json:"url,omitempty"`
-	NumberOfSteps      uint                      `json:"number_of_steps,omitempty"`
-	Published          bool                      `json:"published,omitempty"`
-	Owner              string                    `json:"owner,omitempty"`
-	ModelClass         string                    `json:"model_class,omitempty"`
-	Inputs             []*StoredWorkflowInput    `json:"inputs,omitempty"`
-	Annotation         string                    `json:"annotation,omitempty"`
-	Version            uint                      `json:"version,omitempty"`
-	Steps              []*WorkflowInvocationStep `json:"steps,omitempty"`
+	Id                 blend4go.GalaxyID               `json:"id,omitempty"`
+	Name               string                          `json:"name,omitempty"`
+	Tags               []string                        `json:"tags,omitempty"`
+	Deleted            bool                            `json:"deleted,omitempty"`
+	LatestWorkflowUuid string                          `json:"latest_workflow_uuid,omitempty"`
+	ShowInToolPanel    bool                            `json:"show_in_tool_panel,omitempty"`
+	Url                string                          `json:"url,omitempty"`
+	NumberOfSteps      uint                            `json:"number_of_steps,omitempty"`
+	Published          bool                            `json:"published,omitempty"`
+	Owner              string                          `json:"owner,omitempty"`
+	ModelClass         string                          `json:"model_class,omitempty"`
+	Inputs             map[string]*StoredWorkflowInput `json:"inputs,omitempty"`
+	Annotation         string                          `json:"annotation,omitempty"`
+	Version            uint                            `json:"version,omitempty"`
+	Steps              map[string]*StoredWorkflowStep  `json:"steps,omitempty"`
 }
 
 func (w *StoredWorkflow) GetBasePath() string {

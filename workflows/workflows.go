@@ -55,8 +55,8 @@ func findToolIDs(data map[string]interface{}) ([]*repositories.Repository, error
 	// Search subworkflows
 	// This can be replaced by a recursive query when added to JMESPath https://github.com/jmespath/jmespath.py/issues/110
 	if subworkflows, err := jmespath.Search("steps.*.subworkflow", data); err == nil {
-		for _, subworkflow := range subworkflows.([]map[string]interface{}) {
-			if ids, err := findToolIDs(subworkflow); err == nil {
+		for _, subworkflow := range subworkflows.([]interface{}) {
+			if ids, err := findToolIDs(subworkflow.(map[string]interface{})); err == nil {
 				res = append(res, ids...)
 			} else {
 				return nil, err
@@ -68,12 +68,13 @@ func findToolIDs(data map[string]interface{}) ([]*repositories.Repository, error
 
 	// Append repositories
 	if repos, err := jmespath.Search("steps.*.tool_shed_repository", data); err == nil {
-		for _, repo := range repos.([]map[string]string) {
+		for _, repo := range repos.([]interface{}) {
+			r := repo.(map[string]interface{})
 			res = append(res, &repositories.Repository{
-				Name:              repo["name"],
-				ToolShed:          repo["tool_shed"],
-				Owner:             repo["owner"],
-				ChangesetRevision: repo["changeset_revision"],
+				Name:              r["name"].(string),
+				ToolShed:          r["tool_shed"].(string),
+				Owner:             r["owner"].(string),
+				ChangesetRevision: r["changeset_revision"].(string),
 			})
 		}
 	} else {

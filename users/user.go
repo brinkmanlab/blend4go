@@ -11,11 +11,11 @@ type User struct {
 	Username       string            `json:"username,omitempty"`
 	QuotaPercent   uint              `json:"quota_percent,omitempty"`
 	//Preferences ? `json:"preferences,omitempty"`
-	TotalDiskUsage     uint     `json:"total_disk_usage,omitempty"`
+	TotalDiskUsage     float32  `json:"total_disk_usage,omitempty"`
 	Deleted            bool     `json:"deleted,omitempty"`
 	Purged             bool     `json:"purged,omitempty"`
 	NiceTotalDiskUsage string   `json:"nice_total_disk_usage,omitempty"`
-	Quota              uint     `json:"quota,omitempty"`
+	Quota              string   `json:"quota,omitempty"`
 	Email              string   `json:"email,omitempty"`
 	IsAdmin            bool     `json:"is_admin,omitempty"`
 	TagsUsed           []string `json:"tags_used,omitempty"`

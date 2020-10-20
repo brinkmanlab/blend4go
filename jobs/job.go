@@ -18,8 +18,8 @@ type Job struct {
 	CreateTime     string            `json:"create_time,omitempty"`
 	ModelClass     string            `json:"model_class,omitempty"`
 	Inputs         interface{}       `json:"inputs,omitempty"`
-	Outputs        interface{}       `json:"outputs,omitempty"`
-	Params         interface{}       `json:"params,omitempty"`
+	Outputs        interface{}/*hda or hdca*/ `json:"outputs,omitempty"`
+	Params         interface{} `json:"params,omitempty"`
 }
 
 func (j *Job) GetBasePath() string {
@@ -50,7 +50,7 @@ func NewJob(ctx context.Context, g *blend4go.GalaxyInstance, payload map[string]
 	//POST /api/tools
 	if res, err := g.R(ctx).SetBody(payload).SetResult(&invocationResponse{}).Post("/api/tools"); err == nil {
 		if result, err := blend4go.HandleResponse(res); err == nil {
-			r := result.(invocationResponse)
+			r := result.(*invocationResponse)
 			return r.Jobs, r.Outputs, r.OutputCollections, r.ImplicitCollections, err
 		} else {
 			return nil, nil, nil, nil, err

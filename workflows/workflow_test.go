@@ -11,9 +11,10 @@ import (
 
 func TestNewStoredWorkflow(t *testing.T) {
 	type args struct {
-		ctx  context.Context
-		g    *blend4go.GalaxyInstance
-		json string
+		ctx                              context.Context
+		g                                *blend4go.GalaxyInstance
+		json                             string
+		importTools, publish, importable bool
 	}
 	tests := []struct {
 		name    string
@@ -25,7 +26,7 @@ func TestNewStoredWorkflow(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, err := workflows.NewStoredWorkflow(tt.args.ctx, tt.args.g, tt.args.json)
+			got, err := workflows.NewStoredWorkflow(tt.args.ctx, tt.args.g, tt.args.json, tt.args.importTools, tt.args.publish, tt.args.importable)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("NewStoredWorkflow() error = %v, wantErr %v", err, tt.wantErr)
 				return
