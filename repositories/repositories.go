@@ -135,7 +135,7 @@ func CheckForUpdates(ctx context.Context, g *blend4go.GalaxyInstance, repoID ble
 }
 
 func ResetMetadataAll(ctx context.Context, g *blend4go.GalaxyInstance) error {
-	if res, err := g.R(ctx).SetResult(blend4go.StatusResponse{}).Get("/api/tool_shed_repositories/check_for_updates"); err == nil {
+	if res, err := g.R(ctx).SetResult(blend4go.StatusResponse{}).Put("/api/tool_shed_repositories/reset_metadata_on_installed_repositories"); err == nil {
 		if result, err := blend4go.HandleResponse(res); err == nil {
 			if result.(blend4go.StatusResponse).Status != "ok" {
 				return errors.New(res.Result().(blend4go.StatusResponse).Message)
