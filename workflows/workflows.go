@@ -96,10 +96,11 @@ func Repositories(workflow string) ([]*repositories.Repository, error) {
 		// Reduce to unique values
 		set := make(map[string]*repositories.Repository)
 		for _, i := range res {
-			set[path.Join(i.ToolShed, i.Owner, i.Name, i.ChangesetRevision)] = i
+			i.SetID(path.Join(i.ToolShed, i.Owner, i.Name, i.ChangesetRevision))
+			set[i.GetID()] = i
 		}
 		// Convert keys to list
-		tools := make([]*repositories.Repository, len(set))
+		tools := make([]*repositories.Repository, 0, len(set))
 		for _, i := range set {
 			tools = append(tools, i)
 		}
