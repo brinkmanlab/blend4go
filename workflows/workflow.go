@@ -2,6 +2,7 @@ package workflows
 
 import (
 	"context"
+	"encoding/json"
 	"github.com/brinkmanlab/blend4go"
 	"github.com/brinkmanlab/blend4go/repositories"
 	"path"
@@ -63,10 +64,25 @@ func (w *StoredWorkflow) SetID(id blend4go.GalaxyID) {
 	w.Id = id
 }
 
-func NewStoredWorkflow(ctx context.Context, g *blend4go.GalaxyInstance, json string) (*StoredWorkflow, error) {
-	if res, err := g.R(ctx).SetResult(&StoredWorkflow{galaxyInstance: g}).SetBody(map[string]string{
-		"workflow": json,
-	}).Post(BasePath); err == nil {
+func NewStoredWorkflow(ctx context.Context, g *blend4go.GalaxyInstance, j string, importTools, publish, importable bool) (*StoredWorkflow, error) {
+	jd := &map[string]interface{}{}
+	err := json.Unmarshal([]byte(j), jd)
+	if err != nil {
+		return nil, err
+	}
+	body := map[string]interface{}{
+		"workflow": jd,
+	}
+	if importTools {
+		body["import_tools"] = "true"
+	}
+	if publish {
+		body["publish"] = "true"
+	}
+	if importable {
+		body["importable"] = "true"
+	}
+	if res, err := g.R(ctx).SetResult(&StoredWorkflow{galaxyInstance: g}).SetBody(body).Post(BasePath); err == nil {
 		if result, err := blend4go.HandleResponse(res); err == nil {
 			return result.(*StoredWorkflow), nil
 		} else {
