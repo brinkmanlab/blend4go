@@ -43,6 +43,7 @@ type invocationResponse struct {
 	Outputs             []*histories.HistoryDatasetAssociation           `json:"outputs"`
 	OutputCollections   []*histories.HistoryDatasetCollectionAssociation `json:"output_collections"`
 	ImplicitCollections []*histories.HistoryDatasetCollectionAssociation `json:"implicit_collections"`
+	producesEntryPoints bool                                             `json:"produces_entry_points"`
 }
 
 // Execute tool with a given parameter payload
