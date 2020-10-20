@@ -72,7 +72,13 @@ func HandleResponse(response *resty.Response) (interface{}, error) {
 }
 
 func NewGalaxyInstance(host, apiKey string) (g *GalaxyInstance) {
-	agent := "blend4go"
+	// Automatically attach caller package name to agent
+	pc, _, _, _ := runtime.Caller(1)
+	components := strings.Split(runtime.FuncForPC(pc).Name(), ".")
+	if len(components) > 1 {
+		components = components[:len(components)-1]
+	}
+	agent := strings.Join(components, ".") + " - blend4go"
 	if info, ok := debug.ReadBuildInfo(); ok {
 		agent = agent + " " + info.Main.Version + " " + info.Main.Sum
 	}
