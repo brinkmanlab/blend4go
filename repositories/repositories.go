@@ -99,11 +99,11 @@ func Uninstall(ctx context.Context, g *blend4go.GalaxyInstance, toolShedUrl stri
 
 // Uninstall a specified repository id
 func UninstallID(ctx context.Context, g *blend4go.GalaxyInstance, id string, removeFromDisk bool) error {
-	config := repoInstallConfig{Id: id, RemoveFromDisk: removeFromDisk}
-	if res, err := g.R(ctx).SetBody(config).SetResult(blend4go.StatusResponse{}).Delete("/api/tool_shed_repositories/"); err == nil {
+	config := repoInstallConfig{RemoveFromDisk: removeFromDisk}
+	if res, err := g.R(ctx).SetBody(config).SetResult(&blend4go.StatusResponse{}).Delete(path.Join(BasePath, id)); err == nil {
 		if result, err := blend4go.HandleResponse(res); err == nil {
-			if result.(blend4go.StatusResponse).Status == "ok" {
-				return errors.New(res.Result().(blend4go.StatusResponse).Message)
+			if result.(*blend4go.StatusResponse).Status == "ok" {
+				return errors.New(res.Result().(*blend4go.StatusResponse).Message)
 			}
 			return nil
 		} else {
