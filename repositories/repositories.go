@@ -4,11 +4,23 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
+	"fmt"
 	"github.com/brinkmanlab/blend4go"
+	"path"
 	"strings"
+	"time"
 )
 
 const BasePath = "/api/tool_shed_repositories"
+
+var NON_TERMINAL_REPOSITORY_STATES = map[string]bool{
+	"New":                                true,
+	"Cloning":                            true,
+	"Setting tool versions":              true,
+	"Installing repository dependencies": true,
+	"Installing tool dependencies":       true,
+	"Loading proprietary datatypes":      true,
+}
 
 func List(ctx context.Context, g *blend4go.GalaxyInstance) ([]*Repository, error) {
 	if res, err := g.List(ctx, BasePath, []*Repository{}, nil); err == nil {
@@ -41,7 +53,7 @@ type repoInstallConfig struct {
 }
 
 // Install a specified repository revision from a specified tool shed into Galaxy
-func Install(ctx context.Context, g *blend4go.GalaxyInstance, toolShedUrl string, owner string, name string, changesetRevision string, installToolDependencies bool, installRepositoryDependencies bool, installResolverDependencies bool, toolPanelSectionId blend4go.GalaxyID, newToolPanelSectionLabel string) ([]*Repository, error) {
+func Install(ctx context.Context, g *blend4go.GalaxyInstance, toolShedUrl string, owner string, name string, changesetRevision string, installToolDependencies bool, installRepositoryDependencies bool, installResolverDependencies bool, toolPanelSectionId blend4go.GalaxyID, newToolPanelSectionLabel string, wait uint) ([]*Repository, error) {
 	//https://github.com/galaxyproject/ephemeris/blob/474a1c1cd4d5444ece00a3e53eafcb234643db90/src/ephemeris/shed_tools.py#L374
 	// POST /api/tool_shed_repositories/install_repository_revision
 	// https://docs.galaxyproject.org/en/latest/api/api.html#galaxy.webapps.galaxy.api.tool_shed_repositories.ToolShedRepositoriesController.install_repository_revision
@@ -50,8 +62,38 @@ func Install(ctx context.Context, g *blend4go.GalaxyInstance, toolShedUrl string
 		newToolPanelSectionLabel = ""
 	}
 	// TODO changeset_revision == "" ? install latest
+	if !strings.Contains(toolShedUrl, "://") {
+		toolShedUrl = "https://" + toolShedUrl
+	}
 	config := repoInstallConfig{ToolShedUrl: toolShedUrl, Name: name, Owner: owner, ChangesetRevision: changesetRevision, InstallToolDependencies: installToolDependencies, InstallRepositoryDependencies: installRepositoryDependencies, InstallResolverDependencies: installResolverDependencies, ToolPanelSectionId: toolPanelSectionId, NewToolPanelSectionLabel: newToolPanelSectionLabel}
-	if res, err := g.R(ctx).SetBody(config).Post("/api/tool_shed_repositories/install_repository_revision"); err == nil {
+	if res, err := g.R(ctx).SetBody(config).Post(path.Join(BasePath, "new", "install_repository_revision")); err == nil {
+		if res.StatusCode() == 504 && wait > 0 {
+			// Endpoint timed out, try to recover
+			if repos, err := List(ctx, g); err == nil {
+				for _, repo := range repos {
+					if repo.ToolShed == toolShedUrl && repo.Owner == owner && repo.Name == name && repo.ChangesetRevision == changesetRevision {
+						_, pending := NON_TERMINAL_REPOSITORY_STATES[repo.Status]
+						for pending {
+							time.Sleep(time.Second)
+							_, _ = g.Get(ctx, repo.Id, repo, &map[string]string{})
+							_, pending = NON_TERMINAL_REPOSITORY_STATES[repo.Status]
+							wait--
+							if wait == 0 {
+								break
+							}
+						}
+						if pending {
+							return nil, fmt.Errorf("%v took longer than %v seconds to install", path.Join(toolShedUrl, owner, name, changesetRevision), wait)
+						} else {
+							return []*Repository{repo}, nil
+						}
+					}
+				}
+				return nil, fmt.Errorf("could not recover from repository install timing out")
+			} else {
+				return nil, err
+			}
+		}
 		if _, err := blend4go.HandleResponse(res); err == nil {
 			if strings.HasPrefix(res.String(), "[") {
 				repos := make([]*Repository, 0)
