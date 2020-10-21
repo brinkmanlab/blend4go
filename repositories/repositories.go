@@ -23,11 +23,9 @@ var NON_TERMINAL_REPOSITORY_STATES = map[string]bool{
 }
 
 func List(ctx context.Context, g *blend4go.GalaxyInstance) ([]*Repository, error) {
-	if res, err := g.List(ctx, BasePath, []*Repository{}, nil); err == nil {
-		return res.([]*Repository), nil
-	} else {
-		return nil, err
-	}
+	var repos []*Repository
+	_, err := g.List(ctx, BasePath, &repos, nil)
+	return repos, err
 }
 
 func Get(ctx context.Context, g *blend4go.GalaxyInstance, id blend4go.GalaxyID) (*Repository, error) {

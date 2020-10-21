@@ -9,11 +9,9 @@ const BasePath = "/api/tools"
 
 // returns a list of tools defined by parameters
 func List(ctx context.Context, g *blend4go.GalaxyInstance) ([]*ToolSection, error) {
-	if res, err := g.List(ctx, BasePath, []*ToolSection{}, &map[string]string{}); err == nil {
-		return res.([]*ToolSection), err
-	} else {
-		return nil, err
-	}
+	var sections []*ToolSection
+	_, err := g.List(ctx, BasePath, &sections, &map[string]string{})
+	return sections, err
 }
 
 func Get(ctx context.Context, g *blend4go.GalaxyInstance, id blend4go.GalaxyID) (*Tool, error) {

@@ -33,8 +33,9 @@ func List(ctx context.Context, g *blend4go.GalaxyInstance, published, hidden, de
 		q["missing_tools"] = "True"
 	}
 	// GET /api/workflows
-	res, err := g.List(ctx, BasePath, []*StoredWorkflow{}, &q)
-	return res.([]*StoredWorkflow), err
+	var workflows []*StoredWorkflow
+	_, err := g.List(ctx, BasePath, &workflows, &q)
+	return workflows, err
 }
 
 // Displays information needed to run a workflow.

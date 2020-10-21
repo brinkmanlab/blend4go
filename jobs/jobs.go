@@ -9,11 +9,9 @@ const BasePath = "/api/jobs"
 
 func List(ctx context.Context, g *blend4go.GalaxyInstance) ([]*Job, error) {
 	//GET /api/jobs
-	if res, err := g.List(ctx, BasePath, []*Job{}, nil); err == nil {
-		return res.([]*Job), nil
-	} else {
-		return nil, err
-	}
+	var jobs []*Job
+	_, err := g.List(ctx, BasePath, &jobs, nil)
+	return jobs, err
 }
 
 func Get(ctx context.Context, g *blend4go.GalaxyInstance, id blend4go.GalaxyID) (*Job, error) {

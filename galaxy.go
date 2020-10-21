@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"github.com/go-resty/resty/v2"
 	"path"
+	"reflect"
 	"runtime"
 	"runtime/debug"
 	"strings"
@@ -117,12 +118,19 @@ func (g *GalaxyInstance) List(ctx context.Context, path string, models interface
 	}
 	if res, err := r.SetResult(models).Get(path); err == nil {
 		if results, err := HandleResponse(res); err == nil {
-			if r, ok := results.([]GalaxyModel); ok {
-				for _, m := range r {
-					m.SetGalaxyInstance(g)
+			v := reflect.Indirect(reflect.ValueOf(results))
+			if v.Kind() == reflect.Slice {
+				for i := 0; i < v.Len(); i++ {
+					if m, ok := v.Index(i).Interface().(GalaxyModel); ok {
+						m.SetGalaxyInstance(g)
+					} else {
+						return nil, errors.New("models param element does not implement GalaxyModel")
+					}
 				}
+				return results, nil
+			} else {
+				return nil, errors.New("models param was not of type slice")
 			}
-			return results, err
 		} else {
 			return nil, err
 		}

@@ -29,8 +29,9 @@ func List(ctx context.Context, g *blend4go.GalaxyInstance, deleted bool, filterE
 		q["f_any"] = filterAny
 	}
 	// GET /api/users GET /api/users/deleted
-	res, err := g.List(ctx, BasePath, []*User{}, &q)
-	return res.([]*User), err
+	var users []*User
+	_, err := g.List(ctx, BasePath, &users, &q)
+	return users, err
 }
 
 // Displays information about a user.

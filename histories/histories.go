@@ -15,11 +15,9 @@ func list(ctx context.Context, g *blend4go.GalaxyInstance, category string) ([]*
 	if category != "" {
 		p = path.Join(BasePath, category)
 	}
-	if res, err := g.List(ctx, p, []*History{}, nil); err == nil {
-		return res.([]*History), nil
-	} else {
-		return nil, err
-	}
+	var histories []*History
+	_, err := g.List(ctx, p, &histories, nil)
+	return histories, err
 }
 
 // List histories for the current user
