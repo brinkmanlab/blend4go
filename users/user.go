@@ -3,6 +3,7 @@ package users
 import (
 	"context"
 	"github.com/brinkmanlab/blend4go"
+	"path"
 )
 
 type User struct {
@@ -22,6 +23,9 @@ type User struct {
 }
 
 func (u *User) GetBasePath() string {
+	if u.Deleted {
+		return path.Join(BasePath, "deleted")
+	}
 	return BasePath
 }
 
@@ -40,7 +44,7 @@ func (u *User) SetID(id blend4go.GalaxyID) {
 // Creates a new Galaxy user.
 func NewUser(ctx context.Context, g *blend4go.GalaxyInstance, username, password, email string) (*User, error) {
 	//POST /api/users
-	if res, err := g.R(ctx).SetResult(&User{galaxyInstance: g}).SetBody(map[string]string{ // TODO reuse User struct?
+	if res, err := g.R(ctx).SetResult(&User{galaxyInstance: g}).SetBody(map[string]string{
 		"username": username,
 		"password": password,
 		"email":    email,
@@ -55,8 +59,13 @@ func NewUser(ctx context.Context, g *blend4go.GalaxyInstance, username, password
 	}
 }
 
-// returns an API key for authenticated user based on BaseAuth headers
+// returns an API key for authenticated user
+// password is optional
+// if password == "" the user associated with the Galaxy connection must be an admin
 func (u *User) GetAPIKey(ctx context.Context, password string) (string, error) {
+	if password == "" {
+		// TODO implement GET /api/users/{id}/api_key/inputs
+	}
 	if res, err := u.galaxyInstance.R(ctx).SetBasicAuth(u.Username, password).Get("/api/authenticate/baseauth"); err == nil {
 		if result, err := blend4go.HandleResponse(res); err == nil {
 			return result.(map[string]interface{})["api_key"].(string), nil
@@ -68,19 +77,58 @@ func (u *User) GetAPIKey(ctx context.Context, password string) (string, error) {
 	}
 }
 
-// PUT /api/users/{id}
+// Update the user with the state of the model
 func (u *User) Update(ctx context.Context) error {
+	// PUT /api/users/{id}
 	_, err := u.galaxyInstance.Put(ctx, u, nil)
 	return err
 }
 
-// delete the user with the given id
-func (u *User) Delete(ctx context.Context) error {
-	// DELETE /api/users/{id}
-	return u.galaxyInstance.Delete(ctx, u, nil)
+// Set the users password
+func (u *User) SetPassword(ctx context.Context, current, new string) error {
+	if res, err := u.galaxyInstance.R(ctx).SetBody(map[string]string{
+		"id":       u.Id,
+		"password": new,
+		"confirm":  new,
+		"current":  current,
+	}).Put(path.Join(u.GetBasePath(), u.Id, "password", "inputs")); err == nil {
+		if _, err := blend4go.HandleResponse(res); err == nil {
+			return nil
+		} else {
+			return err
+		}
+	} else {
+		return err
+	}
 }
 
-// POST /api/users/deleted/{id}/undelete Undelete the user with the given id
+// Delete the user with the given id
+func (u *User) Delete(ctx context.Context, purge bool) error {
+	// DELETE /api/users/{id}
+	params := map[string]string{}
+	if purge {
+		params["purge"] = "true"
+		// Must delete before purge request
+		if err := u.galaxyInstance.Delete(ctx, u, nil); err != nil {
+			return err
+		}
+	}
+	return u.galaxyInstance.Delete(ctx, u, &params)
+}
+
+// Undelete the user
+func (u *User) Undelete(ctx context.Context) error {
+	// POST /api/users/deleted/{id}/undelete
+	if res, err := u.galaxyInstance.R(ctx).SetResult(u).Post(path.Join(u.GetBasePath(), u.Id, "undelete")); err == nil {
+		if _, err := blend4go.HandleResponse(res); err == nil {
+			return nil
+		} else {
+			return err
+		}
+	} else {
+		return err
+	}
+}
 
 // GET /api/users/{id}/information/inputs Return user details such as username, email, addresses etc.
 

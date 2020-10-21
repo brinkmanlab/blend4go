@@ -50,7 +50,7 @@ func TestNewUser(t *testing.T) {
 				return
 			}
 			t.Cleanup(func() {
-				err = got.Delete(tt.args.ctx)
+				err = got.Delete(tt.args.ctx, true)
 				if err != nil {
 					t.Errorf("Failed to clean up created user: %v", got)
 				}
@@ -84,7 +84,7 @@ func TestUser_Delete(t *testing.T) {
 				t.Errorf("Failed to prepare user for deletion")
 				return
 			}
-			if err := u.Delete(tt.args.ctx); (err != nil) != tt.wantErr {
+			if err := u.Delete(tt.args.ctx, true); (err != nil) != tt.wantErr {
 				t.Errorf("Delete() error = %v, wantErr %v", err, tt.wantErr)
 			}
 		})

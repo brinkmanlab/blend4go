@@ -35,12 +35,12 @@ func List(ctx context.Context, g *blend4go.GalaxyInstance, deleted bool, filterE
 }
 
 // Displays information about a user.
-func Get(ctx context.Context, g *blend4go.GalaxyInstance, id blend4go.GalaxyID) (*User, error) {
+func Get(ctx context.Context, g *blend4go.GalaxyInstance, id blend4go.GalaxyID, deleted bool) (*User, error) {
 	// GET /api/users/{encoded_id} GET /api/users/deleted/{encoded_id} GET /api/users/current
 	if id == "" {
 		id = "current"
 	}
-	if res, err := g.Get(ctx, id, &User{}, nil); err == nil {
+	if res, err := g.Get(ctx, id, &User{Deleted: deleted}, nil); err == nil {
 		return res.(*User), err
 	} else {
 		return nil, err
