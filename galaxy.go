@@ -51,7 +51,7 @@ func GetAPIKey(ctx context.Context, host, username, password string) (string, er
 	r.SetHeader("Accept", "application/json")
 	r.SetBasicAuth(username, password)
 	if res, err := r.R().SetContext(ctx).Get("/api/authenticate/baseauth"); err == nil {
-		return res.Result().(map[string]string)["api_key"], nil
+		return res.Result().(map[string]interface{})["api_key"].(string), nil
 	} else {
 		return "", err
 	}
