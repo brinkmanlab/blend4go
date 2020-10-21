@@ -23,6 +23,8 @@ type StatusResponse struct {
 }
 
 type ErrorResponse struct {
+	URL      string
+	Method   string
 	Message1 string `json:"message"`
 	Code1    string `json:"code"`
 	Message  string `json:"err_msg"`
@@ -30,7 +32,11 @@ type ErrorResponse struct {
 }
 
 func (e *ErrorResponse) String() string {
-	return fmt.Sprintf("%v%v: %v%v", e.Code, e.Code1, e.Message, e.Message1)
+	return fmt.Sprintf("%v %v %v%v: %v%v", e.Method, e.URL, e.Code, e.Code1, e.Message, e.Message1)
+}
+
+func (e *ErrorResponse) Error() string {
+	return e.String()
 }
 
 type GalaxyInstance struct {
@@ -65,10 +71,15 @@ func GetAPIKey(ctx context.Context, host, username, password string) (string, er
 func HandleResponse(response *resty.Response) (interface{}, error) {
 	if response.IsError() {
 		err := response.Error().(*ErrorResponse)
-		if err.Message == "" && err.Message1 == "" {
-			return nil, errors.New(string(response.Body()))
+		err.Method = response.Request.Method
+		err.URL = response.Request.URL
+		if err.Message == "" {
+			err.Message = err.Message1
 		}
-		return nil, errors.New(err.String())
+		if err.Message == "" {
+			return nil, fmt.Errorf("%v %v: %v", response.Request.Method, response.Request.URL, string(response.Body()))
+		}
+		return nil, err
 	}
 	if response.IsSuccess() {
 		return response.Result(), nil
