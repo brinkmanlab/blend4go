@@ -55,6 +55,19 @@ func NewUser(ctx context.Context, g *blend4go.GalaxyInstance, username, password
 	}
 }
 
+// returns an API key for authenticated user based on BaseAuth headers
+func (u *User) GetAPIKey(ctx context.Context, password string) (string, error) {
+	if res, err := u.galaxyInstance.R(ctx).SetBasicAuth(u.Username, password).Get("/api/authenticate/baseauth"); err == nil {
+		if result, err := blend4go.HandleResponse(res); err == nil {
+			return result.(map[string]interface{})["api_key"].(string), nil
+		} else {
+			return "", err
+		}
+	} else {
+		return "", err
+	}
+}
+
 // PUT /api/users/{id}
 func (u *User) Update(ctx context.Context) error {
 	_, err := u.galaxyInstance.Put(ctx, u, nil)
