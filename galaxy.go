@@ -52,6 +52,7 @@ type GalaxyModel interface {
 }
 
 // returns an API key for authenticated user based on BaseAuth headers
+// Username is the users email address until https://github.com/galaxyproject/galaxy/pull/10521
 func GetAPIKey(ctx context.Context, host, username, password string) (string, error) {
 	r := resty.New()
 	r.SetHostURL(host)

@@ -64,6 +64,9 @@ func NewUser(ctx context.Context, g *blend4go.GalaxyInstance, username, password
 // password is optional
 // if password == "" the user associated with the Galaxy connection must be an admin
 func (u *User) GetAPIKey(ctx context.Context, password string) (string, error) {
+	// TODO https://github.com/galaxyproject/galaxy/pull/10521
+	// TODO https://github.com/galaxyproject/galaxy/pull/10524
+	// TODO https://github.com/galaxyproject/galaxy/pull/10522
 	if password == "" {
 		// GET /api/users/{id}/api_key/inputs
 		if res, err := u.galaxyInstance.R(ctx).Get(path.Join(u.GetBasePath(), u.Id, "api_key", "inputs")); err == nil {
@@ -96,9 +99,9 @@ func (u *User) GetAPIKey(ctx context.Context, password string) (string, error) {
 			return "", err
 		}
 	}
-	if res, err := u.galaxyInstance.R(ctx).SetBasicAuth(u.Username, password).Get("/api/authenticate/baseauth"); err == nil {
+	if res, err := u.galaxyInstance.R(ctx).SetResult(map[string]interface{}{}).SetHeader("X-Api-Key", "").SetBasicAuth(u.Email, password).Get("/api/authenticate/baseauth"); err == nil {
 		if result, err := blend4go.HandleResponse(res); err == nil {
-			return result.(map[string]interface{})["api_key"].(string), nil
+			return (*result.(*map[string]interface{}))["api_key"].(string), nil
 		} else {
 			return "", err
 		}

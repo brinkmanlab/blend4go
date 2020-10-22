@@ -230,20 +230,20 @@ func TestUser_GetAPIKey(t *testing.T) {
 		wantErr  bool
 	}{
 		{
-			name:     "basic9",
+			name:     "basic10",
 			password: "password",
-			email:    "basic9@test.com",
+			email:    "basic10@test.com",
 			fields:   fields{},
 			args: args{
 				ctx:      context.Background(),
-				password: "",
+				password: "password",
 			},
 			wantErr: false,
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			u, err := users.NewUser(tt.args.ctx, g, tt.name, tt.password, tt.email)
+			u, err := users.Get(tt.args.ctx, g, "c9468fdb6dc5c5f1", false) //users.NewUser(tt.args.ctx, g, tt.name, tt.password, tt.email)
 			if err != nil {
 				t.Error(err)
 			}
