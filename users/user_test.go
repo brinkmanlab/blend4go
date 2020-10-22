@@ -3,6 +3,7 @@ package users_test
 import (
 	"context"
 	"github.com/brinkmanlab/blend4go"
+	"github.com/brinkmanlab/blend4go/test_util"
 	"github.com/brinkmanlab/blend4go/users"
 	"testing"
 )
@@ -203,6 +204,56 @@ func TestUser_Update(t *testing.T) {
 			}
 			if err := u.Update(tt.args.ctx); (err != nil) != tt.wantErr {
 				t.Errorf("Update() error = %v, wantErr %v", err, tt.wantErr)
+			}
+		})
+	}
+}
+
+func TestUser_GetAPIKey(t *testing.T) {
+	g := test_util.NewTestInstance()
+	type fields struct {
+		galaxyInstance *blend4go.GalaxyInstance
+		Id             blend4go.GalaxyID
+		Username       string
+		Email          string
+	}
+	type args struct {
+		ctx      context.Context
+		password string
+	}
+	tests := []struct {
+		name     string
+		password string
+		email    string
+		fields   fields
+		args     args
+		wantErr  bool
+	}{
+		{
+			name:     "basic9",
+			password: "password",
+			email:    "basic9@test.com",
+			fields:   fields{},
+			args: args{
+				ctx:      context.Background(),
+				password: "",
+			},
+			wantErr: false,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			u, err := users.NewUser(tt.args.ctx, g, tt.name, tt.password, tt.email)
+			if err != nil {
+				t.Error(err)
+			}
+			got, err := u.GetAPIKey(tt.args.ctx, tt.args.password)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("GetAPIKey() error = %v, wantErr %v", err, tt.wantErr)
+				return
+			}
+			if got == "" {
+				t.Errorf("GetAPIKey() got = %v", got)
 			}
 		})
 	}

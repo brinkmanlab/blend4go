@@ -4,6 +4,7 @@ import (
 	"context"
 	"github.com/brinkmanlab/blend4go"
 	"path"
+	"regexp"
 )
 
 type User struct {
@@ -64,7 +65,36 @@ func NewUser(ctx context.Context, g *blend4go.GalaxyInstance, username, password
 // if password == "" the user associated with the Galaxy connection must be an admin
 func (u *User) GetAPIKey(ctx context.Context, password string) (string, error) {
 	if password == "" {
-		// TODO implement GET /api/users/{id}/api_key/inputs
+		// GET /api/users/{id}/api_key/inputs
+		if res, err := u.galaxyInstance.R(ctx).Get(path.Join(u.GetBasePath(), u.Id, "api_key", "inputs")); err == nil {
+			if _, err := blend4go.HandleResponse(res); err == nil {
+				if re, err := regexp.Compile(`"value": "([^"]+)"`); err == nil {
+					if match := re.FindStringSubmatch(string(res.Body())); match != nil {
+						key := match[1]
+						if key == "Not available." {
+							if res, err := u.galaxyInstance.R(ctx).SetResult("").Post(path.Join(u.GetBasePath(), u.Id, "api_key")); err == nil {
+								if result, err := blend4go.HandleResponse(res); err == nil {
+									return *(result.(*string)), nil
+								} else {
+									return "", err
+								}
+							} else {
+								return "", err
+							}
+						}
+						return key, nil
+					} else {
+						return "", err
+					}
+				} else {
+					return "", err
+				}
+			} else {
+				return "", err
+			}
+		} else {
+			return "", err
+		}
 	}
 	if res, err := u.galaxyInstance.R(ctx).SetBasicAuth(u.Username, password).Get("/api/authenticate/baseauth"); err == nil {
 		if result, err := blend4go.HandleResponse(res); err == nil {
