@@ -1,3 +1,5 @@
+// histories models represent and manipulate histories and their contents within a Galaxy instance
+// Relevant api endpoints are: `/api/histories`, `/api/histories/{id}/contents/`
 package histories
 
 import (

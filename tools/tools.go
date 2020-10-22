@@ -1,3 +1,5 @@
+// tools models represent and manipulate tools within a Galaxy instance
+// Relevant api endpoints are: `/api/tools`
 package tools
 
 import (

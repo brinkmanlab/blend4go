@@ -1,3 +1,10 @@
+// blend4go Galaxy API client library for Golang
+//
+// For most use cases, NewGalaxyInstance and GetAPIKey are the only functions in the root package that should be used.
+// Subpackages provide their own implementations of the remaining functions and those should be preferred.
+// Subpackages are organised by subject. See workflows, users, tools, roles, repositories, libraries, jobs, histories, groups, or datatypes subpackages for more information.
+//
+// A number of subpackages are currently unimplemented, they will be implemented with interest in this project or as needed
 package blend4go
 
 import (

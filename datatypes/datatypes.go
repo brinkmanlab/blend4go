@@ -1,3 +1,5 @@
+// datatypes models represent and manipulate datatypes within a Galaxy instance
+// Relevant api endpoints are: `/api/datatypes`
 package datatypes
 
 // GET /api/datatypes Return an object containing upload datatypes.

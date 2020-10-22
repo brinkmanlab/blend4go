@@ -1,3 +1,5 @@
+// roles models represent and manipulate roles within a Galaxy instance
+// Relevant api endpoints are: `/api/roles`
 package roles
 
 // GET /api/roles Displays a collection (list) of roles.

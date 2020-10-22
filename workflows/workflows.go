@@ -1,3 +1,5 @@
+// workflows models represent and manipulate workflows within a Galaxy instance
+// Relevant api endpoints are: `/api/workflows`, `/api/invocations`
 package workflows
 
 import (

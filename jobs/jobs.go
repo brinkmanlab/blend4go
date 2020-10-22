@@ -1,3 +1,5 @@
+// jobs models represent and manipulate jobs within a Galaxy instance
+// Relevant api endpoints are: `/api/jobs`, `/api/job_lock`
 package jobs
 
 import (

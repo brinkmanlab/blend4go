@@ -1,3 +1,5 @@
+// repositories models represent and manipulate repositories within a Galaxy instance
+// Relevant api endpoints are: `/api/tool_shed_repositories`
 package repositories
 
 import (
