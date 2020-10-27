@@ -65,9 +65,9 @@ func GetAPIKey(ctx context.Context, host, username, password string) (string, er
 	r.SetHostURL(host)
 	r.SetHeader("Accept", "application/json")
 	r.SetBasicAuth(username, password)
-	if res, err := r.R().SetError(&ErrorResponse{}).SetContext(ctx).Get("/api/authenticate/baseauth"); err == nil {
+	if res, err := r.R().SetError(&ErrorResponse{}).SetContext(ctx).SetResult(map[string]interface{}{}).Get("/api/authenticate/baseauth"); err == nil {
 		if result, err := HandleResponse(res); err == nil {
-			return result.(map[string]interface{})["api_key"].(string), nil
+			return (*result.(*map[string]interface{}))["api_key"].(string), nil
 		} else {
 			return "", err
 		}
@@ -175,6 +175,26 @@ func (g *GalaxyInstance) Put(ctx context.Context, model GalaxyModel, params *map
 		r.SetQueryParams(*params)
 	}
 	if res, err := r.SetResult(model).SetBody(model).Put(path.Join(model.GetBasePath(), model.GetID())); err == nil {
+		if result, err := HandleResponse(res); err == nil {
+			m := result.(GalaxyModel)
+			m.SetGalaxyInstance(g)
+			return m, nil
+		} else {
+			return nil, err
+		}
+	} else {
+		return nil, err
+	}
+}
+
+// Helper to make generic PATCH requests to Galaxy API to update objects
+// params is a map of query parameters to add to the request
+func (g *GalaxyInstance) Patch(ctx context.Context, model GalaxyModel, params *map[string]string) (GalaxyModel, error) {
+	r := g.R(ctx)
+	if params != nil {
+		r.SetQueryParams(*params)
+	}
+	if res, err := r.SetResult(model).SetBody(model).Patch(path.Join(model.GetBasePath(), model.GetID())); err == nil {
 		if result, err := HandleResponse(res); err == nil {
 			m := result.(GalaxyModel)
 			m.SetGalaxyInstance(g)
