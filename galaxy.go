@@ -247,5 +247,19 @@ func (g *GalaxyInstance) ToolSheds(ctx context.Context) ([]*ToolShed, error) {
 
 //GET /api/whoami Return information about the current authenticated user.
 //GET /api/configuration Return an object containing exposable configuration settings.
-//GET /api/version Return a description of the major version of Galaxy (e.g. 15.03).
+
+// Return a description of the major version of Galaxy (e.g. 15.03).
+func (g *GalaxyInstance) Version(ctx context.Context) (string, error) {
+	//GET /api/version
+	if res, err := g.R(ctx).SetResult(map[string]interface{}{}).Get("/api/version"); err == nil {
+		if result, err := HandleResponse(res); err == nil {
+			return (*result.(*map[string]interface{}))["version_major"].(string), nil
+		} else {
+			return "", err
+		}
+	} else {
+		return "", err
+	}
+}
+
 //PUT /api/configuration/toolbox Reload the Galaxy toolbox (but not individual tools).
