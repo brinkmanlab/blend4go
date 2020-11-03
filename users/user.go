@@ -3,6 +3,7 @@ package users
 import (
 	"context"
 	"github.com/brinkmanlab/blend4go"
+	"log"
 	"path"
 	"regexp"
 )
@@ -99,7 +100,9 @@ func (u *User) GetAPIKey(ctx context.Context, password string) (string, error) {
 			return "", err
 		}
 	}
-	if res, err := u.galaxyInstance.R(ctx).SetResult(map[string]interface{}{}).SetHeader("X-Api-Key", "").SetBasicAuth(u.Email, password).Get("/api/authenticate/baseauth"); err == nil {
+	r := u.galaxyInstance.R(ctx).SetResult(map[string]interface{}{}).SetHeader("X-Api-Key", "").SetBasicAuth(u.Email, password)
+	log.Printf("[DEBUG] %v %v", r.RawRequest, r.URL)
+	if res, err := r.Get("/api/authenticate/baseauth"); err == nil {
 		if result, err := blend4go.HandleResponse(res); err == nil {
 			return (*result.(*map[string]interface{}))["api_key"].(string), nil
 		} else {

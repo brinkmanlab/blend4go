@@ -12,6 +12,8 @@ import (
 	"errors"
 	"fmt"
 	"github.com/go-resty/resty/v2"
+	"io"
+	"log"
 	"path"
 	"reflect"
 	"runtime"
@@ -47,8 +49,22 @@ func (e *ErrorResponse) Error() string {
 	return e.String()
 }
 
+type LogLevel int
+
+const (
+	NONE LogLevel = iota
+	ERROR
+	WARN
+	INFO
+	DEBUG
+)
+
 type GalaxyInstance struct {
-	Client *resty.Client
+	Client   *resty.Client
+	logErr   *log.Logger
+	logInfo  *log.Logger
+	logDebug *log.Logger
+	logLevel LogLevel
 }
 
 type GalaxyModel interface {
@@ -63,6 +79,7 @@ type GalaxyModel interface {
 func GetAPIKey(ctx context.Context, host, username, password string) (string, error) {
 	r := resty.New()
 	r.SetHostURL(host)
+	log.Printf("[DEBUG] trying to get api key %v", host)
 	r.SetHeader("Accept", "application/json")
 	r.SetBasicAuth(username, password)
 	if res, err := r.R().SetError(&ErrorResponse{}).SetContext(ctx).SetResult(map[string]interface{}{}).Get("/api/authenticate/baseauth"); err == nil {
@@ -97,7 +114,7 @@ func HandleResponse(response *resty.Response) (interface{}, error) {
 }
 
 // Create a new connection handle to an instance of Galaxy
-func NewGalaxyInstance(host, apiKey string) (g *GalaxyInstance) {
+func NewGalaxyInstanceLogger(host, apiKey string, logWriter io.Writer, logLevel LogLevel) (g *GalaxyInstance) {
 	// Automatically attach caller package name to agent
 	pc, _, _, _ := runtime.Caller(1)
 	components := strings.Split(runtime.FuncForPC(pc).Name(), ".")
@@ -114,7 +131,64 @@ func NewGalaxyInstance(host, apiKey string) (g *GalaxyInstance) {
 	r.SetHeader("Accept", "application/json")
 	r.SetHeader("Content-Type", "application/json")
 	r.SetHeader("User-Agent", agent)
-	return &GalaxyInstance{Client: r}
+	return &GalaxyInstance{
+		Client:   r,
+		logErr:   log.New(logWriter, "[Error]", log.Ldate|log.Ltime|log.Lshortfile),
+		logInfo:  log.New(logWriter, "[Info]", log.Ldate|log.Ltime|log.Lshortfile),
+		logDebug: log.New(logWriter, "[Debug]", log.Ldate|log.Ltime|log.Lshortfile),
+		logLevel: logLevel,
+	}
+}
+
+func NewGalaxyInstance(host, apiKey string) (g *GalaxyInstance) {
+	return NewGalaxyInstanceLogger(host, apiKey, log.Writer(), ERROR)
+}
+
+func (g *GalaxyInstance) Error(v ...interface{}) {
+	if g.logLevel >= ERROR {
+		g.logErr.Print(v...)
+	}
+}
+
+func (g *GalaxyInstance) Errorf(format string, v ...interface{}) {
+	if g.logLevel >= ERROR {
+		g.logErr.Printf(format, v...)
+	}
+}
+
+func (g *GalaxyInstance) Info(v ...interface{}) {
+	if g.logLevel >= INFO {
+		g.logErr.Print(v...)
+	}
+}
+
+func (g *GalaxyInstance) Infof(format string, v ...interface{}) {
+	if g.logLevel >= INFO {
+		g.logErr.Printf(format, v...)
+	}
+}
+
+func (g *GalaxyInstance) Debug(v ...interface{}) {
+	if g.logLevel >= DEBUG {
+		g.logErr.Print(v...)
+	}
+}
+
+func (g *GalaxyInstance) Debugf(format string, v ...interface{}) {
+	if g.logLevel >= DEBUG {
+		g.logErr.Printf(format, v...)
+	}
+}
+
+func (g *GalaxyInstance) HandleResponse(response *resty.Response) (interface{}, error) {
+	g.Infof("%v %v", response.Request.Method, response.Request.URL)
+	g.Debugf("Request: %+v\nResponse: %+v", response.Request.RawRequest, response.RawResponse)
+	g.Infof("%v %v", response.StatusCode(), response.Status())
+	res, err := HandleResponse(response)
+	if err != nil {
+		g.Debug(err)
+	}
+	return res, err
 }
 
 // Helper to make generic requests against Galaxy API that return lists of objects
