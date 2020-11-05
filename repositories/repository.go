@@ -1,7 +1,10 @@
 package repositories
 
 import (
+	"context"
+	"fmt"
 	"github.com/brinkmanlab/blend4go"
+	"github.com/brinkmanlab/blend4go/tools"
 )
 
 type Repository struct {
@@ -46,4 +49,43 @@ func (r *Repository) SetID(id blend4go.GalaxyID) {
 
 func (r *Repository) Reload() error {
 	panic("Implement me")
+}
+
+// list Tools provided by Repository
+func (r *Repository) Tools(ctx context.Context) ([]*tools.Tool, error) {
+	if res, err := r.galaxyInstance.R(ctx).SetQueryParams(map[string]string{
+		"tool_shed_url": "https://" + r.ToolShed + "/",
+		"id":            r.GetID(),
+		"controller":    "repositories",
+		"action":        "metadata",
+	}).SetResult(map[string]interface{}{}).Get("/api/tool_shed/request"); err == nil {
+		if result, err := r.galaxyInstance.HandleResponse(res); err == nil {
+			changesets := *result.(*map[string]interface{})
+			if meta, ok := changesets[fmt.Sprintf("%v:%v", r.CtxRev, r.ChangesetRevision)]; ok {
+				if t, ok := (meta.(map[string]interface{}))["tools"]; ok {
+					toolList := t.([]interface{})
+					toolModels := make([]*tools.Tool, len(toolList), len(toolList))
+					for i, item := range toolList {
+						tool := item.(map[string]interface{})
+						toolModels[i] = &tools.Tool{
+							Id:          tool["id"].(string),
+							Name:        tool["name"].(string),
+							Version:     tool["version"].(string),
+							Description: tool["description"].(string),
+							ConfigFile:  tool["tool_config"].(string),
+						}
+					}
+					return toolModels, nil
+				} else {
+					return nil, fmt.Errorf("unexpected response body returned from API: %v", meta)
+				}
+			} else {
+				return nil, fmt.Errorf("unexpected changeset returned from API: %v", changesets)
+			}
+		} else {
+			return nil, err
+		}
+	} else {
+		return nil, err
+	}
 }
