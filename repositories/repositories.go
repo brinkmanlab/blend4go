@@ -98,6 +98,9 @@ func Install(ctx context.Context, g *blend4go.GalaxyInstance, toolShedUrl string
 			if strings.HasPrefix(res.String(), "[") {
 				repos := make([]*Repository, 0)
 				if err := json.Unmarshal(res.Body(), &repos); err == nil {
+					for _, repo := range repos {
+						repo.SetGalaxyInstance(g)
+					}
 					return repos, nil
 				} else {
 					return nil, err

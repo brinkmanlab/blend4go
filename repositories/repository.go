@@ -53,16 +53,37 @@ func (r *Repository) Reload() error {
 
 // list Tools provided by Repository
 func (r *Repository) Tools(ctx context.Context) ([]*tools.Tool, error) {
+	type toolShedRepo struct {
+		Id string `json:"id"`
+	}
+	var repoId string
+
+	// Fetch toolshed repo id
 	if res, err := r.galaxyInstance.R(ctx).SetQueryParams(map[string]string{
-		"tool_shed_url": "https://" + r.ToolShed + "/",
-		"id":            r.GetID(),
-		"controller":    "repositories",
-		"action":        "metadata",
-	}).SetResult(map[string]interface{}{}).Get("/api/tool_shed/request"); err == nil {
+		//"tool_shed_url": "https://" + r.ToolShed + "/",
+		"owner":      r.Owner,
+		"name":       r.Name,
+		"controller": "repositories",
+	}).SetResult([]toolShedRepo{}).Get("/api/tool_shed/request?tool_shed_url=https://" + r.ToolShed + "/"); err == nil {
 		if result, err := r.galaxyInstance.HandleResponse(res); err == nil {
-			changesets := *result.(*map[string]interface{})
-			if meta, ok := changesets[fmt.Sprintf("%v:%v", r.CtxRev, r.ChangesetRevision)]; ok {
-				if t, ok := (meta.(map[string]interface{}))["tools"]; ok {
+			repoId = (*result.(*[]toolShedRepo))[0].Id
+		} else {
+			return nil, err
+		}
+	} else {
+		return nil, err
+	}
+
+	// Fetch repo tools from toolshed
+	if res, err := r.galaxyInstance.R(ctx).SetQueryParams(map[string]string{
+		//"tool_shed_url": "https://" + r.ToolShed + "/",
+		"id":         repoId,
+		"controller": "repositories",
+		"action":     "metadata",
+	}).SetResult(map[string]interface{}{}).Get("/api/tool_shed/request?tool_shed_url=https://" + r.ToolShed + "/"); err == nil {
+		if result, err := r.galaxyInstance.HandleResponse(res); err == nil {
+			for _, changeset := range *result.(*map[string]interface{}) {
+				if t, ok := (changeset.(map[string]interface{}))["tools"]; ok {
 					toolList := t.([]interface{})
 					toolModels := make([]*tools.Tool, len(toolList), len(toolList))
 					for i, item := range toolList {
@@ -78,11 +99,10 @@ func (r *Repository) Tools(ctx context.Context) ([]*tools.Tool, error) {
 					}
 					return toolModels, nil
 				} else {
-					return nil, fmt.Errorf("unexpected response body returned from API: %v", meta)
+					return nil, fmt.Errorf("unexpected response body returned from API: %v", changeset)
 				}
-			} else {
-				return nil, fmt.Errorf("unexpected changeset returned from API: %v", changesets)
 			}
+			return nil, fmt.Errorf("empty response when requesting repostory metadata")
 		} else {
 			return nil, err
 		}
