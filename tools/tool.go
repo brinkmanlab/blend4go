@@ -21,6 +21,7 @@ func (t *ToolSection) SetID(id blend4go.GalaxyID) {
 type Tool struct {
 	galaxyInstance   *blend4go.GalaxyInstance
 	Id               string   `json:"id,omitempty"`
+	Guid             string   `json:"guid,omitempty"`
 	Name             string   `json:"name,omitempty"`
 	Version          string   `json:"version,omitempty"`
 	MinWidth         int      `json:"min_width,omitempty"`

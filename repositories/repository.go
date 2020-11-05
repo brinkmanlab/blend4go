@@ -69,6 +69,7 @@ func (r *Repository) Tools(ctx context.Context) ([]*tools.Tool, error) {
 						tool := item.(map[string]interface{})
 						toolModels[i] = &tools.Tool{
 							Id:          tool["id"].(string),
+							Guid:        tool["guid"].(string),
 							Name:        tool["name"].(string),
 							Version:     tool["version"].(string),
 							Description: tool["description"].(string),
