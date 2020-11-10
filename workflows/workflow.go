@@ -103,17 +103,25 @@ func (w *StoredWorkflow) Delete(ctx context.Context) error {
 }
 
 // Update the specified workflow. If json == "", only the name, annotation, and show_in_tool_panel will be updated.
-func (w *StoredWorkflow) Update(ctx context.Context, json string) error {
+func (w *StoredWorkflow) Update(ctx context.Context, j string) error {
+	// TODO https://github.com/galaxyproject/galaxy/issues/10682
+	// TODO https://github.com/galaxyproject/galaxy/issues/10683
+	// TODO https://github.com/galaxyproject/galaxy/issues/10684
 	// PUT /api/workflows/{id}
-	body := make(map[string]string)
+	body := make(map[string]interface{})
 	if w.ShowInToolPanel {
 		body["menu_entry"] = "True"
 	} else {
 		body["menu_entry"] = "False"
 	}
 
-	if json != "" {
-		body["workflow"] = json
+	if j != "" {
+		jd := &map[string]interface{}{}
+		err := json.Unmarshal([]byte(j), jd)
+		if err != nil {
+			return err
+		}
+		body["workflow"] = jd
 	}
 
 	body["name"] = w.Name
