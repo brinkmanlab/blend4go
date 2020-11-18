@@ -83,7 +83,11 @@ func (r *Repository) Tools(ctx context.Context) ([]*tools.Tool, error) {
 	}).SetResult(map[string]interface{}{}).Get("/api/tool_shed/request?tool_shed_url=https://" + r.ToolShed + "/"); err == nil {
 		if result, err := r.galaxyInstance.HandleResponse(res); err == nil {
 			for _, changeset := range *result.(*map[string]interface{}) {
-				if t, ok := (changeset.(map[string]interface{}))["tools"]; ok {
+				revision := changeset.(map[string]interface{})
+				if revision["changeset_revision"].(string) != r.ChangesetRevision {
+					continue
+				}
+				if t, ok := revision["tools"]; ok {
 					toolList := t.([]interface{})
 					toolModels := make([]*tools.Tool, len(toolList), len(toolList))
 					for i, item := range toolList {
@@ -102,7 +106,7 @@ func (r *Repository) Tools(ctx context.Context) ([]*tools.Tool, error) {
 					return nil, fmt.Errorf("unexpected response body returned from API: %v", changeset)
 				}
 			}
-			return nil, fmt.Errorf("empty response when requesting repostory metadata")
+			return nil, fmt.Errorf("empty response when requesting repostory metadata or changeset revision not found")
 		} else {
 			return nil, err
 		}
