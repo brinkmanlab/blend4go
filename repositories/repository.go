@@ -103,7 +103,7 @@ func (r *Repository) Tools(ctx context.Context) ([]*tools.Tool, error) {
 					}
 					return toolModels, nil
 				} else {
-					return nil, fmt.Errorf("unexpected response body returned from API: %v", changeset)
+					return make([]*tools.Tool, 0, 0), nil
 				}
 			}
 			return nil, fmt.Errorf("empty response when requesting repostory metadata or changeset revision not found")
