@@ -11,6 +11,7 @@ import (
 var galaxyInstance = test_util.NewTestInstance()
 
 func createTestQuota() (test_quota *Quota, err error) {
+	// TODO configure test users and groups
 	test_quota, err = NewQuota(context.Background(), galaxyInstance, "test", "0", "test", SetTo, nil, nil, NotDefault)
 	if err != nil {
 		test_quota, err = GetName(context.Background(), galaxyInstance, "test")

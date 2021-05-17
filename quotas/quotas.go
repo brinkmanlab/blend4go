@@ -16,7 +16,7 @@ func get(ctx context.Context, g *blend4go.GalaxyInstance, model *Quota) (*Quota,
 	// GET /api/quotas/{encoded_id} GET /api/quotas/deleted/{encoded_id}
 	if res, err := g.Get(ctx, model.GetID(), model, nil); err == nil {
 		quota := res.(*Quota)
-		quota.populateDefault()
+		quota.populateIndirect()
 		return quota, nil
 	} else {
 		return nil, err
@@ -39,7 +39,7 @@ func List(ctx context.Context, g *blend4go.GalaxyInstance, deleted bool) ([]*Quo
 		if err != nil {
 			return nil, err
 		}
-		quota.populateDefault()
+		quota.populateIndirect()
 	}
 	return quotas, err
 }

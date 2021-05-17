@@ -122,7 +122,7 @@ func TestQuota_GetBasePath(t *testing.T) {
 				Users:          tt.fields.Users,
 				Groups:         tt.fields.Groups,
 				Deleted:        tt.fields.Deleted,
-				RawDefaults:    tt.fields.RawDefaults,
+				rawDefaults:    tt.fields.RawDefaults,
 			}
 			if got := q.GetBasePath(); got != tt.want {
 				t.Errorf("GetBasePath() = %v, want %v", got, tt.want)
@@ -171,7 +171,7 @@ func TestQuota_GetID(t *testing.T) {
 				Users:          tt.fields.Users,
 				Groups:         tt.fields.Groups,
 				Deleted:        tt.fields.Deleted,
-				RawDefaults:    tt.fields.RawDefaults,
+				rawDefaults:    tt.fields.RawDefaults,
 			}
 			if got := q.GetID(); got != tt.want {
 				t.Errorf("GetID() = %v, want %v", got, tt.want)
@@ -227,7 +227,7 @@ func TestQuota_SetGalaxyInstance(t *testing.T) {
 				Users:          tt.fields.Users,
 				Groups:         tt.fields.Groups,
 				Deleted:        tt.fields.Deleted,
-				RawDefaults:    tt.fields.RawDefaults,
+				rawDefaults:    tt.fields.RawDefaults,
 			}
 			q.SetGalaxyInstance(tt.args.instance)
 			if q.galaxyInstance != tt.want {
@@ -282,7 +282,7 @@ func TestQuota_SetID(t *testing.T) {
 				Users:          tt.fields.Users,
 				Groups:         tt.fields.Groups,
 				Deleted:        tt.fields.Deleted,
-				RawDefaults:    tt.fields.RawDefaults,
+				rawDefaults:    tt.fields.RawDefaults,
 			}
 			q.SetID(tt.args.id)
 			if q.Id != tt.want {
@@ -378,7 +378,7 @@ func TestQuota_Update(t *testing.T) {
 				Users:          tt.fields.Users,
 				Groups:         tt.fields.Groups,
 				Deleted:        test_quota.Deleted,
-				RawDefaults:    test_quota.RawDefaults,
+				rawDefaults:    test_quota.rawDefaults,
 			}
 			test_quota.Bytes = tt.fields.Bytes
 			test_quota.Operation = tt.fields.Operation
@@ -430,11 +430,11 @@ func TestQuota_populateDefault(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			q := &Quota{
 				Default:     tt.fields.Default,
-				RawDefaults: tt.fields.RawDefaults,
+				rawDefaults: tt.fields.RawDefaults,
 			}
-			q.populateDefault()
+			q.populateIndirect()
 			if q.Default != tt.want {
-				t.Errorf("populateDefault() got = %v, want %v", q.Default, tt.want)
+				t.Errorf("populateIndirect() got = %v, want %v", q.Default, tt.want)
 			}
 		})
 	}

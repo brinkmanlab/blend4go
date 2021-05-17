@@ -3,6 +3,8 @@ package quotas
 import (
 	"context"
 	"errors"
+	"github.com/brinkmanlab/blend4go/groups"
+	"github.com/brinkmanlab/blend4go/users"
 	"path"
 	"strconv"
 
@@ -22,24 +24,34 @@ const (
 	Unlimited                                 = "unlimited"
 )
 
+type userQuotaAssociation struct {
+	User *users.User `json:"user"`
+}
+
+type groupQuotaAssociation struct {
+	Group *groups.Group `json:"group"`
+}
+
 type Quota struct {
-	galaxyInstance *blend4go.GalaxyInstance
-	Id             blend4go.GalaxyID       `json:"id,omitempty"`
-	Name           string                  `json:"name,omitempty"`
-	Bytes          uint64                  `json:"bytes,omitempty"`
-	Operation      quotaOperation          `json:"operation,omitempty"`
-	Default        defaultQuotaAssociation `json:"-"`
-	Description    string                  `json:"description,omitempty"`
-	DisplayAmount  string                  `json:"display_amount,omitempty"`
-	Users          []blend4go.GalaxyID     `json:"users,omitempty"`
-	Groups         []blend4go.GalaxyID     `json:"groups,omitempty"`
-	Deleted        bool                    `json:"-"`
-	RawDefaults    []map[string]string     `json:"default,omitempty"`
+	galaxyInstance         *blend4go.GalaxyInstance
+	Id                     blend4go.GalaxyID       `json:"id,omitempty"`
+	Name                   string                  `json:"name,omitempty"`
+	Bytes                  uint64                  `json:"bytes,omitempty"`
+	Operation              quotaOperation          `json:"operation,omitempty"`
+	Default                defaultQuotaAssociation `json:"-"`
+	Description            string                  `json:"description,omitempty"`
+	DisplayAmount          string                  `json:"display_amount,omitempty"`
+	Users                  []*users.User           `json:"-"`
+	Groups                 []*groups.Group         `json:"-"`
+	UserQuotaAssociations  []userQuotaAssociation  `json:"users,omitempty"`
+	GroupQuotaAssociations []groupQuotaAssociation `json:"groups,omitempty"`
+	Deleted                bool                    `json:"-"`
+	RawDefaults            []map[string]string     `json:"default,omitempty"`
 }
 
 // NewQuota creates a new quota for groups or users
 // operation - may be forced to SetTo depending on other parameters
-func NewQuota(ctx context.Context, g *blend4go.GalaxyInstance, name, amount, description string, operation quotaOperation, users, groups []string, default_for defaultQuotaAssociation) (*Quota, error) {
+func NewQuota(ctx context.Context, g *blend4go.GalaxyInstance, name, amount, description string, operation quotaOperation, users, groups []blend4go.GalaxyID, default_for defaultQuotaAssociation) (*Quota, error) {
 	if name == "" || description == "" {
 		return nil, errors.New("name and description required")
 	}
@@ -61,7 +73,7 @@ func NewQuota(ctx context.Context, g *blend4go.GalaxyInstance, name, amount, des
 	}).Post(BasePath); err == nil {
 		if result, err := blend4go.HandleResponse(res); err == nil {
 			quota := result.(*Quota)
-			quota.populateDefault()
+			quota.populateIndirect()
 			return quota, nil
 		} else {
 			return nil, err
@@ -71,10 +83,18 @@ func NewQuota(ctx context.Context, g *blend4go.GalaxyInstance, name, amount, des
 	}
 }
 
-func (q *Quota) populateDefault() {
+func (q *Quota) populateIndirect() {
 	q.Default = NotDefault
 	for _, d := range q.RawDefaults {
 		q.Default = defaultQuotaAssociation(d["type"])
+	}
+	q.Users = []*users.User{}
+	for _, userassoc := range q.UserQuotaAssociations {
+		q.Users = append(q.Users, userassoc.User)
+	}
+	q.Groups = []*groups.Group{}
+	for _, groupassoc := range q.GroupQuotaAssociations {
+		q.Groups = append(q.Groups, groupassoc.Group)
 	}
 }
 
@@ -104,15 +124,28 @@ func (q *Quota) Update(ctx context.Context, amount string) error {
 	if amount == "" {
 		amount = strconv.FormatUint(q.Bytes, 10)
 	}
-	_, err := q.galaxyInstance.R(ctx).SetBody(map[string]interface{}{
+	var users []blend4go.GalaxyID
+	for _, user := range q.Users {
+		users = append(users, user.GetID())
+	}
+	var groups []blend4go.GalaxyID
+	for _, group := range q.Groups {
+		groups = append(groups, group.GetID())
+	}
+	body := map[string]interface{}{
 		"name":        q.Name,
 		"amount":      amount,
 		"operation":   q.Operation,
 		"description": q.Description,
-		"in_users":    q.Users,
-		"in_groups":   q.Groups,
-		"default":     q.Default,
-	}).Put(path.Join(q.GetBasePath(), q.Id))
+		"in_users":    users,
+		"in_groups":   groups,
+		//"default":     q.Default,
+	}
+	// TODO remove this conditional block after https://github.com/galaxyproject/galaxy/issues/11980
+	if quota, err := get(ctx, q.galaxyInstance, &Quota{Id: q.Id, Deleted: q.Deleted}); err == nil && quota.Default != q.Default {
+		body["default"] = q.Default
+	}
+	_, err := q.galaxyInstance.R(ctx).SetBody(body).Put(path.Join(q.GetBasePath(), q.Id))
 	if err == nil {
 		_, err = get(ctx, q.galaxyInstance, q)
 	}
@@ -129,18 +162,23 @@ func (q *Quota) Delete(ctx context.Context, purge bool) error {
 			return err
 		}
 	}
-	params := map[string]string{}
-	if purge && false { // TODO https://github.com/galaxyproject/galaxy/issues/11975
+
+	if purge { // TODO https://github.com/galaxyproject/galaxy/issues/11975
+		params := map[string]string{}
 		params["purge"] = "true"
-		// Must delete before purge request
-		if err := q.galaxyInstance.Delete(ctx, q, nil); err != nil {
+		r := q.galaxyInstance.R(ctx)
+		if res, err := r.SetBody(&params).Delete(path.Join(q.GetBasePath(), q.GetID())); err == nil {
+			_, err := blend4go.HandleResponse(res)
+			q.Deleted = true
+			return err
+		} else {
 			return err
 		}
+	} else {
+		err := q.galaxyInstance.Delete(ctx, q, nil)
 		q.Deleted = true
+		return err
 	}
-	err := q.galaxyInstance.Delete(ctx, q, &params)
-	q.Deleted = true
-	return err
 }
 
 // Undelete quota
