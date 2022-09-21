@@ -156,36 +156,12 @@ func (l *Library) SetPermissions(ctx context.Context, permissions *LibraryPermis
 }
 
 // Return a list of library files and folders.
-func (l *Library) Contents(ctx context.Context) ([]*LibraryItem, error) {
-	var items []*LibraryItem
+func (l *Library) Contents(ctx context.Context) ([]*libraryItem, error) {
+	var items []*libraryItem
 	// GET /api/libraries/{library_id}/contents
 	_, err := l.galaxyInstance.List(ctx, path.Join(l.GetBasePath(), l.GetID(), "contents"), &items, nil)
 	for _, item := range items {
-		item.libraryId = l.GetID()
+		item.library = l
 	}
 	return items, err
 }
-
-// GET /api/libraries/{library_id}/contents/{id} Returns information about library file or folder.
-
-// POST /api/libraries/{library_id}/contents Create a new library file or folder.
-
-// PUT /api/libraries/{library_id}/contents/{id} Create an ImplicitlyConvertedDatasetAssociation.
-
-// DELETE /api/libraries/{library_id}/contents/{id} Delete the LibraryDataset with the given id.
-
-// GET /api/libraries/datasets/{encoded_dataset_id} Show the details of a library dataset.
-
-// GET /api/libraries/datasets/{encoded_dataset_id}/versions/{encoded_ldda_id} Display a specific version of a library dataset (i.e. ldda).
-
-// GET /api/libraries/datasets/{encoded_dataset_id}/permissions Display information about current or available roles for a given dataset permission.
-
-// PATCH /api/libraries/datasets/{encoded_dataset_id} Update the given library dataset (the latest linked ldda).
-
-// POST /api/libraries/datasets/{encoded_dataset_id}/permissions Set permissions of the given library dataset to the given role ids.
-
-// DELETE /api/libraries/datasets/{encoded_dataset_id} Mark the dataset deleted or undeleted.
-
-// POST /api/libraries/datasets Load dataset(s) from the given source into the library.
-
-// GET /api/libraries/datasets/download/{archive_format} POST /api/libraries/datasets/download/{archive_format}
